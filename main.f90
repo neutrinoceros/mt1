@@ -1,5 +1,7 @@
 program ephemerids
+use maths
 use data_parameters
+
 !Comment intégrer RA15M.f, qui n'est pas un module (pour l'instant) ?
 
 implicit none
@@ -7,11 +9,18 @@ real(8),dimension(:)  ,allocatable :: Masses
 real(8),dimension(:,:),allocatable :: Positions, Velocities, Forces
 integer :: i=0
 
-
 allocate(Masses(N_BOD))
 allocate(Positions(N_BOD,3))
 allocate(Velocities(N_BOD,3))
 allocate(Forces(N_BOD,3))
+
+
+! interface
+!    function cross(a,b)
+!      real(8),dimension(3),intent(in) :: a,b
+!      real(8),dimension(3) :: cross
+!    end function cross
+! end interface
 
 
 !------------------------------
@@ -24,8 +33,7 @@ do i=1,10
 end do
 
 
-end program ephemerids
-
+contains
 
 !------------------------------
 !      local subroutines
@@ -54,18 +62,18 @@ subroutine updateForces(Masses, Positions, Velocities, Forces, center, N_BOD, GC
   !local
   integer :: i,j,k
   real(8) :: D !distance
-  real(8),dimension(3) :: diffpos
+  real(8),dimension(3) :: diffpos,dF!relative position, contribution to force on a body. tmp variables.
   
   Forces(:,:) = 0
   do i=1,N_BOD
-     do j=i,N_BOD
-        if (j .ne. i) then!HUGE OPTIMIZATION TO DO HERE  
-           diffpos = (Positions(i,:)-Positions(j,:))**2
-           D = sum(diffpos)
-           Forces(i,:) = Forces(i,:) - GCST*Masses(j) / D**3 * (Positions(i,:) - Positions(j,:))
-           !note that those are forces *by units of mass*, ie accelerations.
-           !This corresponds to what the RADAU integrator denotes as "forces", if I'm not mistaken 
-        end if
+     do j=i+1,N_BOD
+        diffpos = (Positions(i,:)-Positions(j,:))
+        D = sum(diffpos)
+        dF = GCST*Masses(j) / D**3 * (Positions(i,:) - Positions(j,:))
+        Forces(i,:) = Forces(i,:) - dF
+        Forces(j,:) = Forces(j,:) + dF
+        !note that those are forces *by units of mass*, ie accelerations.
+        !This corresponds to what the RADAU integrator denotes as "forces", if I'm not mistaken 
      end do!j
   end do!i
 end subroutine updateForces
@@ -111,18 +119,52 @@ subroutine updateEnergy(M, P, V, N_BOD, G, En)
   real(8) :: En
 
   !local
-  real(8) :: T, U, dU!kinetic and potential energies. dU serves as cache variable
+  real(8) :: T, U, dU, D!kinetic and potential energies. dU and D are tmp
+  real(8),dimension(N_BOD) :: modsquareV!modules of V**2
+  real(8),dimension(3) :: diffpos
   integer :: i,j
 
+  !kinetic energy computation
+  do i=1,N_BOD
+     modsquareV(i) = sum(V(i,:)**2)
+  end do
+  T = 1./2 * sum(M*modsquareV)
 
-  T = 1./2 * sum(M*V**2)
+  !potential energy computation
   U = 0
   do i=1,N_BOD
      do j=i+1,N_BOD
-        dU = M(i) * M(j) / abs(P(j)-P(i))
-        U = U + dU
+        diffpos = (P(i,:)-P(j,:))
+        D = abs(sum(diffpos))
+        dU = M(i) * M(j) / D
+        U  = U + 2*dU
      end do
   end do
   U  = -G * U
   En =  T + U
 end subroutine updateEnergy
+
+
+subroutine updateAngularMomentum(M, P, V, N_BOD, L)
+  ! computes the total angular momentum with respect to the frame's origin
+  use maths
+  implicit none
+  integer :: N_BOD
+  real(8),dimension(N_BOD)   :: M!masses
+  real(8),dimension(N_BOD,3) :: P,V!positions,velocities
+  !output
+  real(8) :: L!total angular momentum
+  !local
+  real(8),dimension(N_BOD,3) :: Li
+  integer :: i
+  
+  do i=1,N_BOD
+     Li(i,:) = M(i) * cross(V(i,:),P(i,:))
+  end do
+  L = sum(Li)
+
+end subroutine updateAngularMomentum
+
+
+
+end program ephemerids
