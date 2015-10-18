@@ -14,15 +14,6 @@ allocate(Positions(N_BOD,3))
 allocate(Velocities(N_BOD,3))
 allocate(Forces(N_BOD,3))
 
-
-! interface
-!    function cross(a,b)
-!      real(8),dimension(3),intent(in) :: a,b
-!      real(8),dimension(3) :: cross
-!    end function cross
-! end interface
-
-
 !------------------------------
 !          main loop
 !------------------------------
