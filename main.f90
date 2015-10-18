@@ -58,8 +58,8 @@ subroutine updateForces(Masses, Positions, Velocities, Forces, center, N_BOD, GC
   
   Forces(:,:) = 0
   do i=1,N_BOD
-     do j=1,N_BOD
-        if (j .ne. i) then  
+     do j=i,N_BOD
+        if (j .ne. i) then!HUGE OPTIMIZATION TO DO HERE  
            diffpos = (Positions(i,:)-Positions(j,:))**2
            D = sum(diffpos)
            Forces(i,:) = Forces(i,:) - GCST*Masses(j) / D**3 * (Positions(i,:) - Positions(j,:))
@@ -99,3 +99,30 @@ subroutine updateCenter(Masses, Positions, N_BOD, center)
   end do
   
 end subroutine updateCenter
+
+
+subroutine updateEnergy(M, P, V, N_BOD, G, En)
+  implicit none
+  integer :: N_BOD
+  real :: G!Newton's constant
+  real(8),dimension(N_BOD)   :: M!masses
+  real(8),dimension(N_BOD,3) :: P,V!positions,velocities
+  !output
+  real(8) :: En
+
+  !local
+  real(8) :: T, U, dU!kinetic and potential energies. dU serves as cache variable
+  integer :: i,j
+
+
+  T = 1./2 * sum(M*V**2)
+  U = 0
+  do i=1,N_BOD
+     do j=i+1,N_BOD
+        dU = M(i) * M(j) / abs(P(j)-P(i))
+        U = U + dU
+     end do
+  end do
+  U  = -G * U
+  En =  T + U
+end subroutine updateEnergy
