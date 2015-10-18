@@ -6,7 +6,4 @@ TARGET  = program
 
 
 $(TARGET) : $(MODULES) $(MAIN)
-	f95 $(CFLAGS) $(MODULES) $(MAIN) -o $(TARGET) 
-#clean:
-#	rm *o
-
+	f95 $(CFLAGS) $(MODULES) $(MAIN) -o $(TARGET)
