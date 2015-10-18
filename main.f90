@@ -137,24 +137,24 @@ end subroutine updateEnergy
 
 
 subroutine updateAngularMomentum(M, P, V, N_BOD, L)
-  ! computes the total angular momentum with respect to the frame's origin                                                                                       
-     use maths                                                                                                                                                      
-     implicit none                                                                                                                                                  
-     integer :: N_BOD                                                                                                                                               
-     real(8),dimension(N_BOD)   :: M!masses                                                                                                                         
-      real(8),dimension(N_BOD,3) :: P,V!positions,velocities                                                                                                         
-     !output                                                                                                                                                        
-     real(8),dimension(3) :: L!total angular momentum                                                                                                               
-      !local                                                                                                                                                         
-      real(8),dimension(N_BOD,3) :: Li                                                                                                                               
-         integer :: i                                                                                                                                                   
-                                                                                                                                                                         
-         do i=1,N_BOD                                                                                                                                                   
-             Li(i,:) = M(i) * cross(V(i,:),P(i,:))                                                                                                                       
-          end do                                                                                                                                                         
-          do i=1,3                                                                                                                                                       
-          L(i) = sum(Li(i,:))                                                                                                                                         
-       end do                                                                                                                                                     
+  ! computes the total angular momentum with respect to the frame's origin 
+  use maths
+  implicit none
+  integer :: N_BOD
+  real(8),dimension(N_BOD)   :: M!masses
+  real(8),dimension(N_BOD,3) :: P,V!positions,velocities
+  !output
+  real(8),dimension(3) :: L!total angular momentum
+  !local
+  real(8),dimension(N_BOD,3) :: Li
+  integer :: i
+
+  do i=1,N_BOD
+     Li(i,:) = M(i) * cross(V(i,:),P(i,:))
+  end do
+  do i=1,3                                                                
+     L(i) = sum(Li(i,:))
+  end do
 end subroutine updateAngularMomentum
 
 
