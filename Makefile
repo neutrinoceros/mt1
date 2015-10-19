@@ -1,6 +1,6 @@
 #run 'make' in command line to run compilation according to rules described in this file
 MAIN    = main.f90
-MODULES = maths.f90 data_parameters.f90 RA15M.f
+MODULES = maths.f90 sub_nbodies.f90 data_parameters.f90 RA15M.f
 FLAGS   = -Wall -Wextra  -fbounds-check
 TARGET  = program
 
