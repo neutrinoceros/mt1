@@ -1,6 +1,5 @@
 program ephemerids
 
-
 use maths
 use sub_nbodies
 use data_parameters
@@ -21,11 +20,15 @@ allocate(Forces(N_BOD,3))
 !          main loop
 !------------------------------
 
-!a joke of a script
+print*, "Loading data for initial conditions...."
+call loadIC(Masses,Positions,Velocities,N_BOD)!works fine !
+
+print*, "Doing nothing just to show how much I know about fortran."
 do i=1,10
    print*,i
 end do
 
+print*,"Show's over. (yes, already)"
 
 contains
 
@@ -33,15 +36,27 @@ contains
 !      local subroutines
 !------------------------------
 
-subroutine loadIC(filename, Masses, Positions, Velocities, N_BOD)
+subroutine loadIC(M, P, V, N_BOD)
   !intended to load initial conditions (IC) from a file
   implicit none
-  character :: filename
+!  character,dimension(21) :: filename
   integer :: N_BOD
-  real(8),dimension(N_BOD)   :: Masses
-  real(8),dimension(N_BOD,3) :: Positions, Velocities
+  real(8),dimension(N_BOD)   :: M
+  real(8),dimension(N_BOD,3) :: P, V
 
-  !...need an example formatted file for implementation...
+  open(50,file='data/data_planets.dat',status='unknown')   
+  do i=1,N_BOD
+     read(50,*)!ligne de header (nom du corps)
+     read(50,*),M(i)!masse (GM)
+     read(50,*),P(i,1),P(i,2),P(i,3)!position
+     read(50,*),V(i,1),V(i,2),V(i,3)!vitesse
+     read(50,*)!ligne vide
+
+     ! print*,M(i)
+     ! print*,P(i,1),P(i,2),P(i,3)!position
+     ! print*,V(i,1),V(i,2),V(i,3)!vitesse
+  end do
+  close(50)
 
 end subroutine loadIC
 
