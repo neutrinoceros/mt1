@@ -1,7 +1,11 @@
 # mt1
-n bodies scholar collaboration project in fortran90
+N bodies scholar collaboration project in fortran90
 
-authors : Clément Robert and Riwan Kherouf, supervised by Valery Lainey
+**Authors** : Clément Robert & Riwan Kherouf, supervised by Valery Lainey
+
+##Goals
+
+Learn numerical methods for ephemerids computations.
 
 ##Git Memento
 **get the code**
@@ -39,7 +43,7 @@ authors : Clément Robert and Riwan Kherouf, supervised by Valery Lainey
 * ~~finish implentation of walk subroutine.~~
 * ~~debug writing results.dat~~
 
-**Optional**
+**optional**
 
 * write a decent Makefile (compilation is currently crudely made with a hard-to-edit shell script compil.sh)
 * check conservation of (a,e,i,omega,Omega,M(t)) for a 2 bodies pb (Sun + Mercury)
