@@ -36,8 +36,10 @@ print*, "Let's rock, folks."
 
 open(10,file='results.dat',status='unknown')
 open(16,file='out_everhart.dat')
+
+write(10,*) "# time              Etot              Ltot"
+write(10,"(3E18.8E3)") ftime, Etot, Ltot
 do i=1,100
-   print*,i
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)

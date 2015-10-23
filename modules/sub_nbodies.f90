@@ -37,13 +37,12 @@ subroutine Energy(P, V, time, En)
   use data_planets
   implicit none
   real(8) :: time
-  real(8),dimension(N_BOD)   :: M!masses
   real(8),dimension(3*N_BOD) :: P,V!positions,velocities
   !output
   real(8) :: En
 
   !local
-  real(8) :: T, U, dU, D!kinetic and potential energies. dU and D are tmp
+  real(8) :: T, U, dU, d!kinetic and potential energies. dU and D are tmp
   real(8),dimension(N_BOD) :: modsquareV!modules of V**2
   real(8),dimension(3) :: diffpos
   integer :: i,j,ii,jj
@@ -53,7 +52,7 @@ subroutine Energy(P, V, time, En)
      ii = 3*(i-1)+1
      modsquareV(i) = sum(V(ii:ii+3)**2)
   end do
-  T = 1./2 * sum(M*modsquareV)
+  T = 1./2 * sum(MASSES*modsquareV)
 
   !potential energy computation
   U = 0
@@ -62,8 +61,8 @@ subroutine Energy(P, V, time, En)
      do j=i+1,N_BOD
         jj = 3*(j-1)+1
         diffpos = (P(ii:ii+3)-P(jj:jj+3))
-        D = abs(sum(diffpos))
-        dU = M(i) * M(j) / D
+        d = abs(sum(diffpos))
+        dU = MASSES(i) * MASSES(j) / d
         U  = U + 2*dU
      end do
   end do
@@ -119,7 +118,6 @@ subroutine updateCenter(Masses, Positions, N_BOD, center)
   do j=1,N_BOD
      center(j) = center(j)/masstot
   end do
-  
 end subroutine updateCenter
 
 end module sub_nbodies
