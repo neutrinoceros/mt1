@@ -1,7 +1,7 @@
 # mt1
 N bodies scholar collaboration project in fortran90. Work under progress.
 
-**Authors** : [clement.robert@protonmail.com](Clément Robert) & Riwan Kherouf, supervised by Valery Lainey
+**Authors** : [Clément Robert](clement.robert@protonmail.com) & Riwan Kherouf, supervised by Valery Lainey
 
 ##Goals
 
