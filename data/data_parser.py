@@ -2,7 +2,6 @@
 
 import re
 
-
 with open("table5.dat",'r') as flux :
     text = '\n'.join(flux.readlines()).replace('–','-')
 
@@ -34,6 +33,5 @@ for i in range(11) :
 
 print table
 
-with open('data_planets.dat','w') as flux :
+with open('icplanets.dat','w') as flux :
     flux.write(table)
-

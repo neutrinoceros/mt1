@@ -3,6 +3,7 @@ program ephemerids
 use maths
 use sub_nbodies
 use data_parameters
+!use radau
 
 !Comment intégrer RA15M.f, qui n'est pas un module (pour l'instant) ?
 
@@ -44,7 +45,7 @@ subroutine loadIC(M, P, V, N_BOD)
   real(8),dimension(N_BOD)   :: M
   real(8),dimension(N_BOD,3) :: P, V
 
-  open(50,file='data/data_planets.dat',status='unknown')   
+  open(50,file='data/icplanets.dat',status='unknown')   
   do i=1,N_BOD
      read(50,*)!ligne de header (nom du corps)
      read(50,*),M(i)!masse (GM)
