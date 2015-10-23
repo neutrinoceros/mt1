@@ -9,13 +9,13 @@ use data_parameters
 
 implicit none
 real(8),dimension(:)  ,allocatable :: Masses
-real(8),dimension(:,:),allocatable :: Positions, Velocities, Forces
+real(8),dimension(:),allocatable :: Positions, Velocities, Forces
 integer :: i=0
 
 allocate(Masses(N_BOD))
-allocate(Positions(N_BOD,3))
-allocate(Velocities(N_BOD,3))
-allocate(Forces(N_BOD,3))
+allocate(Positions(3*N_BOD))
+allocate(Velocities(3*N_BOD))
+allocate(Forces(3*N_BOD))
 
 !------------------------------
 !          main loop
@@ -43,23 +43,25 @@ subroutine loadIC(M, P, V, N_BOD)
 !  character,dimension(21) :: filename
   integer :: N_BOD
   real(8),dimension(N_BOD)   :: M
-  real(8),dimension(N_BOD,3) :: P, V
+  real(8),dimension(3*N_BOD) :: P, V
 
+  !local 
+  integer :: j
   open(50,file='data/icplanets.dat',status='unknown')   
   do i=1,N_BOD
+     j=3*(i-1)
      read(50,*)!ligne de header (nom du corps)
      read(50,*),M(i)!masse (GM)
-     read(50,*),P(i,1),P(i,2),P(i,3)!position
-     read(50,*),V(i,1),V(i,2),V(i,3)!vitesse
+     read(50,*),P(j+1),P(j+2),P(j+3)!position
+     read(50,*),V(j+1),V(j+2),V(j+3)!vitesse
      read(50,*)!ligne vide
 
      ! print*,M(i)
-     ! print*,P(i,1),P(i,2),P(i,3)!position
-     ! print*,V(i,1),V(i,2),V(i,3)!vitesse
+     ! print*,P(j+1),P(j+2),P(j+3)!position
+     ! print*,V(j+1),V(j+2),V(j+3)!vitesse
   end do
   close(50)
 
 end subroutine loadIC
-
 
 end program ephemerids
