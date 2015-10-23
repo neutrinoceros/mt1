@@ -35,15 +35,18 @@ ftime = STEP
 print*, "Let's rock, folks."
 
 open(10,file='results.dat',status='unknown')
+open(16,file='out_everhart.dat')
 do i=1,100
+   print*,i
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(10,"(3E25.8E3)"), ftime, Etot, Ltot
+   write(10,"(3E18.8E3)") ftime, Etot, Ltot
    itime = ftime
    ftime = ftime + STEP
 end do
 close(10)
+close(16)
 
 print*, "If you can read this, you can assume the code ran normaly. Also, you rule."
 
@@ -59,9 +62,10 @@ subroutine walk(X, V, itime, ftime)
   real(8),dimension(3*N_BOD) :: X,V
   real(8) :: itime, ftime
   !local
-  integer :: xl,ll,nv,nclass,nor,nsor !probably not all integers...
+  real(8) :: xl
+  integer :: ll,nv,nclass,nor,nsor !probably not all integers...
 
-  xl = 1 !time step size
+  xl = STEP !time step size
   ll = -1 !if <0 : constant step, elif >0 : tolerance à la troncature numérique (1e-12 chez Valéry) 
   nv = N_BOD !number of simultaneous diff eq
   nclass = -2 !ode form is "y''=F(y,t)"
