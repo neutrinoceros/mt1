@@ -66,5 +66,5 @@ for i in range(11) :
         dm += '/)\n'
 
 dm += '\nend module data_planets\n'
-with open('../data_planets.f90','w') as flux :
+with open('../modules/data_planets.f90','w') as flux :
     flux.write(dm)

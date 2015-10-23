@@ -5,6 +5,7 @@ authors : Clément Robert and Riwan Kherouf, supervised by Valery Lainey
 
 ##To do
 
+* debug writing results.dat : y u no work already, mate ?
 * verify data units consistency and that of the subroutines (careful with masses in GM and "forces" computations) 
 * make basic tests on the current code :
   - check deviation for a rapidly evolving planet (Mercury or the Moon) with a 100yr back-and-forth integration to adjust time step (criterion is 100m deviation max)

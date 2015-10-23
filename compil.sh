@@ -3,8 +3,8 @@
 
 TARGET="program"
 MAIN="main.f90"
-SRC77="RA15M.f"
-SRC90="maths.f90 data_parameters.f90 data_planets.f90 sub_nbodies.f90"
+SRC77="modules/RA15M.f"
+SRC90="modules/maths.f90 modules/data_parameters.f90 modules/data_planets.f90 modules/sub_nbodies.f90"
 OUT="maths.o data_parameters.o data_planets.o sub_nbodies.o RA15M.o"
 WFLAGS="-Wall -Wextra  -fbounds-check"
 
