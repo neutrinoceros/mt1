@@ -1,6 +1,6 @@
 #specific files
-fort.16 #don't know what it is but we don't need it
-program #compile it yourself, that's for your own good :3
+*.16 #don't know what it is but we don't need it
+*program #compile it yourself, that's for your own good :3
 
 # Compiled Object files
 *.slo
