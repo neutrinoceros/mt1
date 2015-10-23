@@ -4,8 +4,8 @@
 TARGET="program"
 MAIN="main.f90"
 SRC77="RA15M.f"
-SRC90="maths.f90 sub_nbodies.f90 data_parameters.f90"
-OUT="maths.o sub_nbodies.o data_parameters.o RA15M.o"
+SRC90="maths.f90 data_parameters.f90 data_planets.f90 sub_nbodies.f90"
+OUT="maths.o data_parameters.o data_planets.o sub_nbodies.o RA15M.o"
 WFLAGS="-Wall -Wextra  -fbounds-check"
 
 f95 -c $SRC77

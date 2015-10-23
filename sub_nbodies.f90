@@ -1,11 +1,12 @@
 module sub_nbodies
 
 contains 
-subroutine updateForces(Masses, Positions, Velocities, Forces, center, N_BOD, GCST)
+
+subroutine updateForces(Positions, Velocities, time, Forces)
+  use data_parameters
+  use data_planets
   implicit none
-  integer :: N_BOD
-  real :: GCST
-  real(8),dimension(N_BOD)   :: Masses
+  real(8) :: time
   real(8),dimension(3*N_BOD) :: Positions, Velocities, Forces
   real(8),dimension(3) :: center
   !local
@@ -59,10 +60,12 @@ subroutine updateCenter(Masses, Positions, N_BOD, center)
 end subroutine updateCenter
 
 
-subroutine updateEnergy(M, P, V, N_BOD, G, En)
+!subroutine updateEnergy(M, P, V, N_BOD, G, En)
+subroutine updateEnergy(P, V, time, En)
+  use data_parameters
+  use data_planets
   implicit none
-  integer :: N_BOD
-  real :: G!Newton's constant
+  real(8) :: time
   real(8),dimension(N_BOD)   :: M!masses
   real(8),dimension(3*N_BOD) :: P,V!positions,velocities
   !output
@@ -93,17 +96,18 @@ subroutine updateEnergy(M, P, V, N_BOD, G, En)
         U  = U + 2*dU
      end do
   end do
-  U  = -G * U
+  U  = -U * GCST
   En =  T + U
 end subroutine updateEnergy
 
 
-subroutine updateAngularMomentum(M, P, V, N_BOD, L)
+subroutine updateAngularMomentum(P, V, time, L)
   ! computes the total angular momentum with respect to the frame's origin 
   use maths
+  use data_parameters
+  use data_planets
   implicit none
-  integer :: N_BOD
-  real(8),dimension(N_BOD)   :: M!masses
+  real(8) :: time
   real(8),dimension(3*N_BOD) :: P,V!positions,velocities
   !output
   real(8),dimension(3) :: L!total angular momentum (scalar)
@@ -113,12 +117,11 @@ subroutine updateAngularMomentum(M, P, V, N_BOD, L)
 
   do i=1,N_BOD
      ii = 3*(i-1)+1
-     Li(ii:ii+3) = M(i) * cross(V(ii:ii+3),P(ii:ii+3))
+     Li(ii:ii+3) = Masses(i) * cross(V(ii:ii+3),P(ii:ii+3))
   end do
   do i=1,3                                                                
      L(i) = sum(Li(ii:ii+3))
   end do
 end subroutine updateAngularMomentum
-
 
 end module sub_nbodies

@@ -30,8 +30,41 @@ for i in range(11) :
     table += '    '.join(POS[3*i:3*i+3])+'\n'
     table += '    '.join(VEL[3*i:3*i+3])+'\n'
     table += '\n'
-
-print table
+#print table
 
 with open('icplanets.dat','w') as flux :
     flux.write(table)
+
+
+
+#-----------------------------------
+#   write data_planets.f90 module
+#-----------------------------------
+
+dm = 'module data_planets \n\n\treal(8),parameter,dimension(11) :: Masses=(/ &\n'
+for i in range(11) :
+    dm += '\t\t'+MASSES[i]+POWERS[i] 
+    if i <10 :
+        dm += ',&\n'
+    else :
+        dm += '/)\n\n'
+
+dm += '\treal(8),parameter,dimension(3*11) :: IPositions=(/ &\n'
+for i in range(11) :
+    dm += '\t\t'+','.join(POS[3*i:3*i+3])
+    if i <10 :
+        dm += ',&\n'
+    else :
+        dm += '/)\n\n'
+
+dm += '\treal(8),dimension(3*11),parameter :: IVelocities=(/ &\n'
+for i in range(11) :
+    dm += '\t\t'+','.join(VEL[3*i:3*i+3])
+    if i <10 :
+        dm += ',&\n'
+    else :
+        dm += '/)\n'
+
+dm += '\nend module data_planets\n'
+with open('../data_planets.f90','w') as flux :
+    flux.write(dm)

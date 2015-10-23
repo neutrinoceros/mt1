@@ -5,6 +5,8 @@ authors : Clément Robert and Riwan Kherouf, supervised by Valery Lainey
 
 ##To do
 
+* finish implentation of walk subroutine
+* make Masses a parameter array
 * verify data units consistency and that of the subroutines (careful with masses in GM and "forces" computations) 
 * use the RADAU integrator (or use MERCURY) 
 * make basic tests on the current code
