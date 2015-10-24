@@ -31,9 +31,16 @@ Learn numerical methods for ephemerids computations.
 
 ##To do
 
+**debbuging**
+
+* none of the planets ever move except for the sun, which trajectory is not even a straight line and depends on integration parameters
+* check use of RADAU and computations made in subroutine Forces
+* angular momentum never varies even the slightest, that is to good to be true.
+
+
 **mandatory**
 
-* verify data units consistency and that of the subroutines (careful with masses in GM and "forces" computations) (*done, but need a second opinion to ensure all calculations were done right*) 
+* verify data units consistency and that of the subroutines (careful with masses in GM and "forces" computations) (*done, but needs a second opinion to ensure all calculations were done right*)
 * make basic tests on the current code :
   - check deviation for a rapidly evolving planet (Mercury or the Moon) with a 100yr back-and-forth integration to adjust time step (criterion is 100m deviation max)
   - check conservation of total energy and total angular momentum with 11 bodies (Sun + all planets + moon) (*this one is almost done, we need to redo it after above steps have been checked*)
