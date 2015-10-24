@@ -3,6 +3,9 @@ N bodies scholar collaboration project in fortran90. Work under progress.
 
 **Authors** : [Clément Robert](clement.robert@protonmail.com) & Riwan Kherouf, supervised by Valery Lainey
 
+![illustration](img/6m7bodies.png?raw=true)
+
+
 ##Goals
 
 Learn numerical methods for ephemerids computations.
