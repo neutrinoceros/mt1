@@ -5,8 +5,6 @@ use sub_nbodies
 use data_parameters
 use data_planets !initial conditions + masses
 
-!Comment intégrer RA15M.f, qui n'est pas un module (pour l'instant) ?
-
 implicit none
 real(8),dimension(:),allocatable :: Positions, Velocities
 integer :: i=0
@@ -20,7 +18,6 @@ allocate(Velocities(3*N_BOD))
 !             init
 !------------------------------
 print*, "Initializing."
-!call loadIC(Masses,Positions,Velocities)!works fine !
 Positions = IPositions
 Velocities = IVelocities
 call Energy(Positions, Velocities, ftime, Etot)
@@ -39,7 +36,10 @@ open(16,file='out_everhart.dat')
 
 write(10,*) "# time              Etot              Ltot"
 write(10,"(3E18.8E3)") ftime, Etot, Ltot
-do i=1,100
+do i=1,int(1e3)
+   if (mod(i,int(1e2)) .eq. 0) then 
+       print*, "i = ",i,"t =",t," , Etot =", Etot," , Ltot =", Ltot
+   end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
@@ -50,7 +50,7 @@ end do
 close(10)
 close(16)
 
-print*, "If you can read this, you can assume the code ran normaly. Also, you rule."
+print*, "End of the line"
 
 contains
 
