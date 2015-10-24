@@ -48,6 +48,19 @@ with open('icplanets.dat','w') as flux :
 
 dm = 'module data_planets \n\n'
 dm += 'use data_parameters\n'
+
+lennames=10
+dm += '\tcharacter(len='+str(lennames)+'),parameter,dimension(N_BOD) :: NAMES=(/ &\n'
+for i in range(n_bod) :
+    abrv=NAMES[i][0:lennames]
+    if len(abrv)<lennames:
+        abrv+=' '*(lennames-len(abrv))
+    dm += '\t\t"'+abrv+'"'
+    if i < n_bod - 1 :
+        dm += ',&\n'
+    else :
+        dm += '/)\n\n'
+
 dm += '\treal(8),parameter,dimension(N_BOD) :: MASSES=(/ &\n'
 for i in range(n_bod) :
     dm += '\t\t'+MASSES[i]

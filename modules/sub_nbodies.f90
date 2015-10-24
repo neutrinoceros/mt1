@@ -21,7 +21,7 @@ subroutine Forces(X, V, time, F)
         jj = 3*(j-1)+1
         diffpos = X(ii:ii+3)-X(jj:jj+3)
         D = sqrt(sum(diffpos**2))
-        !print*, "i = ",i, "j = ",j,diffpos!"D = ",D
+        print*, NAMES(i),"VS ",NAMES(j)," diffpos = ",diffpos!"D = ",D
         dF = GCST * Masses(j) * diffpos / D**3
         F(ii:ii+3) = F(ii:ii+3) - dF
         F(jj:jj+3) = F(jj:jj+3) + dF
@@ -94,31 +94,31 @@ subroutine AMomentum(P, V, time, L)
 end subroutine AMomentum
 
 
-subroutine updateCenter(Masses, Positions, N_BOD, center)
-  !updates the position of the system's mass center
-  implicit none
-  integer :: N_BOD
-  real(8),dimension(N_BOD)   :: Masses
-  real(8),dimension(3*N_BOD) :: Positions
-  real(8),dimension(3) :: center
-  !local
-  real(8) :: masstot=0
-  integer :: i,j,ii
+! subroutine updateCenter(Masses, Positions, N_BOD, center)
+!   !updates the position of the system's mass center
+!   implicit none
+!   integer :: N_BOD
+!   real(8),dimension(N_BOD)   :: Masses
+!   real(8),dimension(3*N_BOD) :: Positions
+!   real(8),dimension(3) :: center
+!   !local
+!   real(8) :: masstot=0
+!   integer :: i,j,ii
 
-  center(:) = 0
+!   center(:) = 0
 
-  do i=1,N_BOD
-     ii = 3*(i-1)+1
-     masstot = masstot + Masses(i) !Il faudrait que la somme se fasse des plus petits corps aux plus grands
-                                   !le plus simple serait donc de les ordonner dès le départ à la lecture du fichier
-     do j=1,3
-        center(j) = center(j) + Masses(i) * Positions(ii+j-1)
-     end do
-  end do
+!   do i=1,N_BOD
+!      ii = 3*(i-1)+1
+!      masstot = masstot + Masses(i) !Il faudrait que la somme se fasse des plus petits corps aux plus grands
+!                                    !le plus simple serait donc de les ordonner dès le départ à la lecture du fichier
+!      do j=1,3
+!         center(j) = center(j) + Masses(i) * Positions(ii+j-1)
+!      end do
+!   end do
 
-  do j=1,N_BOD
-     center(j) = center(j)/masstot
-  end do
-end subroutine updateCenter
+!   do j=1,N_BOD
+!      center(j) = center(j)/masstot
+!   end do
+! end subroutine updateCenter
 
 end module sub_nbodies

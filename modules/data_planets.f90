@@ -1,6 +1,10 @@
 module data_planets 
 
 use data_parameters
+	character(len=10),parameter,dimension(N_BOD) :: NAMES=(/ &
+		"Sun       ",&
+		"Mercury   "/)
+
 	real(8),parameter,dimension(N_BOD) :: MASSES=(/ &
 		1.96581638133e+13,&
 		3263479.59695/)

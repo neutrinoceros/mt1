@@ -26,8 +26,9 @@ call AMomentum(Positions, Velocities, ftime, Ltot)
 itime = 0.
 ftime = STEP
 OFMT1 = "(3E18.8E3)"
-OFMT2 = "(6E18.8E3)" !pas adapted en cas de changement de N_BOD !!!
+OFMT2 = "(22E18.8E3)"
 
+print*, 'bodies used are : ',NAMES
 !------------------------------
 !          main loop
 !------------------------------
@@ -46,10 +47,10 @@ do while (itime < TMAX)
    i = i+1
    if (mod(i,int(1e2)) .eq. 0) then 
    !    print *,"t =",int(itime)," , Etot =", Etot," , Ltot =", Ltot
+      !print*, Positions(4:6), Velocities(4:6) !mercury
       write(20,OFMT2) Positions
    end if
    !print*,sqrt(sum(Positions(10:12)**2))
-
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
@@ -87,30 +88,30 @@ subroutine walk(X, V, itime, ftime)
 end subroutine walk
 
 
-subroutine loadIC(M, IP, IV)
-  !useless
-  use data_parameters
-  !intended to load initial conditions (IC) from a file
-  implicit none
-  !character,dimension(21) :: filename
-  real(8),dimension(N_BOD)   :: M
-  real(8),dimension(3*N_BOD) :: IP, IV !initial positions and velocities
+! subroutine loadIC(M, IP, IV)
+!   !useless
+!   use data_parameters
+!   !intended to load initial conditions (IC) from a file
+!   implicit none
+!   !character,dimension(21) :: filename
+!   real(8),dimension(N_BOD)   :: M
+!   real(8),dimension(3*N_BOD) :: IP, IV !initial positions and velocities
 
-  !local 
-  integer :: j
-  open(50,file='data/icplanets.dat',status='unknown')   
-  do i=1,N_BOD
-     j=3*(i-1)
-     read(50,*)!ligne de header (nom du corps)
-     read(50,*),M(i)!masse (GM)
-     read(50,*),IP(j+1),IP(j+2),IP(j+3)!position
-     read(50,*),IV(j+1),IV(j+2),IV(j+3)!vitesse
-     read(50,*)!ligne vide
-     ! print*,M(i)
-     ! print*,P(j+1),P(j+2),P(j+3)!position
-     ! print*,V(j+1),V(j+2),V(j+3)!vitesse
-  end do
-  close(50)
-end subroutine loadIC
+!   !local 
+!   integer :: j
+!   open(50,file='data/icplanets.dat',status='unknown')   
+!   do i=1,N_BOD
+!      j=3*(i-1)
+!      read(50,*)!ligne de header (nom du corps)
+!      read(50,*),M(i)!masse (GM)
+!      read(50,*),IP(j+1),IP(j+2),IP(j+3)!position
+!      read(50,*),IV(j+1),IV(j+2),IV(j+3)!vitesse
+!      read(50,*)!ligne vide
+!      ! print*,M(i)
+!      ! print*,P(j+1),P(j+2),P(j+3)!position
+!      ! print*,V(j+1),V(j+2),V(j+3)!vitesse
+!   end do
+!   close(50)
+! end subroutine loadIC
 
 end program ephemerids
