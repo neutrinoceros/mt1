@@ -22,13 +22,6 @@ subroutine Forces(X, V, time, F)
         diffpos = X(ii:ii+2)-X(jj:jj+2)
         D = sqrt(sum(diffpos**2))
 
-!        print*,X
-!        print*,"X(ii:ii+2) = ",X(ii:ii+2)
-!        print*,"X(jj:jj+2) = ",X(jj:jj+2)
-!        print*,"diffpos =    ",diffpos!"D = ",D
-!        print*,time
-!        print*,       
-
         dF = GCST * diffpos / D**3
         F(ii:ii+2) = F(ii:ii+2) - dF * Masses(j)
         F(jj:jj+2) = F(jj:jj+2) + dF * Masses(i)

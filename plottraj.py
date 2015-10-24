@@ -31,6 +31,14 @@ for n,c,name in zip(range(n_bod),colors,names) :
 ax.set_aspect(1)
 #ax.set_xlim(-1.5,1.5)
 #ax.set_ylim(-1.5,1.5)
-pl.legend()
 
+ax.set_xlabel(r'$x$ (a.u.)',size=20)
+ax.set_ylabel(r'$y$ (a.u.)',size=20)
+ax.set_aspect('equal','datalim')
+pl.legend(loc=2,frameon=False)
+
+for ext in ['pdf','png'] :
+    fig.savefig('./img/6m7bodies.'+ext)
+    fig.savefig('./img/6m7bodies_t.'+ext,transparent=True)
+    
 ex=raw_input("type 'enter' to exit program :    ")

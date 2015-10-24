@@ -33,10 +33,10 @@ Learn numerical methods for ephemerids computations.
 
 **debbuging**
 
-* none of the planets ever move except for the sun, which trajectory is not even a straight line and depends on integration parameters
-* check use of RADAU and computations made in subroutine Forces
+* ~~none of the planets ever move except for the sun, which trajectory is not even a straight line and depends on integration parameters~~
+* ~~check use of RADAU and computations made in subroutine Forces~~
 * angular momentum never varies even the slightest, that is to good to be true.
-
+* plottraj.py scripts fails if we use more than 7 bodies (probably an issue in fortran when writing column-heavy files)
 
 **mandatory**
 
