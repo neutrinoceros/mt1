@@ -45,23 +45,24 @@ write(20,OFMT2) Positions
 i=0
 do while (itime < TMAX)
    i = i+1
-   if (mod(i,int(1e2)) .eq. 0) then 
-   !    print *,"t =",int(itime)," , Etot =", Etot," , Ltot =", Ltot
+   !print*,"in main : i=",i
+   !print*,
+   if (mod(i,int(1e1)) .eq. 0) then 
+      !print *,"t =",int(itime)," , Etot =", Etot," , Ltot =", Ltot
       !print*, Positions(4:6), Velocities(4:6) !mercury
       write(20,OFMT2) Positions
    end if
-   !print*,sqrt(sum(Positions(10:12)**2))
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(10,OFMT1) ftime, Etot, Ltot
-   itime = ftime
+   itime = itime + STEP
    ftime = ftime + STEP
 end do
 close(10)
 close(16)
 
-print*, "End of the line"
+print*, "End of the line, final time reached : ", ftime
 
 contains
 
@@ -78,13 +79,14 @@ subroutine walk(X, V, itime, ftime)
   real(8) :: xl
   integer :: ll,nv,nclass,nor,nsor !probably not all integers...
 
-  xl = STEP !time step size
-  ll = -1 !if <0 : constant step, elif >0 : tolerance à la troncature numérique (1e-12 chez Valéry) 
-  nv = N_BOD !number of simultaneous diff eq
+  xl = 1 !time step size
+  ll = -1 !if < 0 : constant step, elif > 0 : tolerance à la troncature numérique (1e-12 chez Valéry) 
+  nv = 3*N_BOD !number of simultaneous diff eq
   nclass = -2 !ode form is "y''=F(y,t)"
   nor = 1 !useless here (commented)
-  nsor = 100 !refresh sortie (angular momentum) every nsor step
-  call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,AMomentum)
+  nsor = 1 !refresh sortie (angular momentum) every nsor step
+!     RA15M(X,V,TD,   TF0,  XL,LL,NV,NCLASS,NOR,nsor,FORCE ,SORTIE   )  
+ call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,AMomentum)
 end subroutine walk
 
 

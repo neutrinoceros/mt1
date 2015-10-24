@@ -19,12 +19,19 @@ subroutine Forces(X, V, time, F)
      ii = 3*(i-1)+1
      do j=i+1,N_BOD
         jj = 3*(j-1)+1
-        diffpos = X(ii:ii+3)-X(jj:jj+3)
+        diffpos = X(ii:ii+2)-X(jj:jj+2)
         D = sqrt(sum(diffpos**2))
-        print*, NAMES(i),"VS ",NAMES(j)," diffpos = ",diffpos!"D = ",D
-        dF = GCST * Masses(j) * diffpos / D**3
-        F(ii:ii+3) = F(ii:ii+3) - dF
-        F(jj:jj+3) = F(jj:jj+3) + dF
+
+!        print*,X
+!        print*,"X(ii:ii+2) = ",X(ii:ii+2)
+!        print*,"X(jj:jj+2) = ",X(jj:jj+2)
+!        print*,"diffpos =    ",diffpos!"D = ",D
+!        print*,time
+!        print*,       
+
+        dF = GCST * diffpos / D**3
+        F(ii:ii+2) = F(ii:ii+2) - dF * Masses(j)
+        F(jj:jj+2) = F(jj:jj+2) + dF * Masses(i)
         !note that those are forces *by units of mass*, ie accelerations.
         !This corresponds to what the RADAU integrator denotes as "forces", if I'm not mistaken 
      end do!j
@@ -51,7 +58,7 @@ subroutine Energy(P, V, time, En)
   !kinetic energy computation
   do i=1,N_BOD
      ii = 3*(i-1)+1
-     modsquareV(i) = sum(V(ii:ii+3)**2)
+     modsquareV(i) = sum(V(ii:ii+2)**2)
   end do
   T = 1./2 * sum(MASSES(1:N_BOD)*modsquareV)
 
@@ -61,7 +68,7 @@ subroutine Energy(P, V, time, En)
      ii = 3*(i-1)+1
      do j=i+1,N_BOD
         jj = 3*(j-1)+1
-        diffpos = (P(ii:ii+3)-P(jj:jj+3))
+        diffpos = (P(ii:ii+2)-P(jj:jj+2))
         d = abs(sum(diffpos))
         dU = MASSES(i) * MASSES(j) / d
         U  = U + 2*dU
@@ -88,9 +95,9 @@ subroutine AMomentum(P, V, time, L)
 
   do i=1,N_BOD
      ii = 3*(i-1)+1
-     Ltmp(ii:ii+3) = Masses(i) * cross(V(ii:ii+3),P(ii:ii+3))
+     Ltmp(ii:ii+2) = Masses(i) * cross(V(ii:ii+2),P(ii:ii+2))
   end do                                    
-  L = sqrt(sum(Ltmp(ii:ii+3)**2))
+  L = sqrt(sum(Ltmp(ii:ii+2)**2))
 end subroutine AMomentum
 
 
