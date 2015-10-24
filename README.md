@@ -44,7 +44,7 @@ Learn numerical methods for ephemerids computations.
 **mandatory**
 
 * [ ] verify data units consistency and that of the subroutines (careful with masses in GM and "forces" computations) (*done, but needs a second opinion to ensure all calculations were done right*)
-* make basic tests on the current code :
+* [ ] make basic tests on the current code :
   - [ ] check deviation for a rapidly evolving planet (Mercury or the Moon) with a 100yr back-and-forth integration to adjust time step (criterion is 100m deviation max)
   - [ ] check conservation of total energy and total angular momentum with 11 bodies (Sun + all planets + moon) (*this one is almost done, we need to redo it after above steps have been checked*)
 * [x] get initial-conditions data from pdf (in doc, table 5 and table 8) to .dat
