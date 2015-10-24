@@ -36,9 +36,12 @@ open(16,file='out_everhart.dat')
 
 write(10,*) "# time              Etot              Ltot"
 write(10,"(3E18.8E3)") ftime, Etot, Ltot
-do i=1,int(1e3)
+
+i=0
+do while (itime < TMAX)
+   i = i+1
    if (mod(i,int(1e2)) .eq. 0) then 
-       print*, "i = ",i,"t =",t," , Etot =", Etot," , Ltot =", Ltot
+       print*,"t =",itime," , Etot =", Etot," , Ltot =", Ltot
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)

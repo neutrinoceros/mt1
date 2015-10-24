@@ -16,8 +16,9 @@ ax2.plot(t,l,c='r',label=r'$L_{tot}$')
 
 ax1.set_xlim(t[0],t[-1])
 ax1.set_xlabel(r'$t$',size=20)
-for ax,ylabel,i in zip([ax1,ax2],[r'$E(t)/E_i$',r'$L(t)/L_i$'],range(2,4)) :
+for ax,ylabel,i,qty in zip([ax1,ax2],[r'$E(t)$',r'$L(t)$'],range(2,4),[e,l]) :
     ax.set_ylabel(ylabel,size=20)
     ax.legend(loc=i)
-#    ax.set_yscale('log')
+    if max(qty) > 100 * min(qty) and min(qty)*max(qty) > 0 :
+        ax.set_yscale('log')
 pl.show()

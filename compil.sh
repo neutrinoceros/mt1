@@ -1,5 +1,8 @@
-#alternative to a clean, working, proper makefile that I don't know how to write.
 #!/bin/bash
+
+cd data
+python data_parser.py
+cd ../
 
 TARGET="program"
 MAIN="main.f90"
