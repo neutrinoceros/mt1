@@ -10,6 +10,7 @@ real(8),dimension(:),allocatable :: Positions, Velocities
 integer :: i=0
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
+character(len=30) :: OFMT1,OFMT2
 
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
@@ -24,6 +25,8 @@ call Energy(Positions, Velocities, ftime, Etot)
 call AMomentum(Positions, Velocities, ftime, Ltot)
 itime = 0.
 ftime = STEP
+OFMT1 = "(3E18.8E3)"
+OFMT2 = "(6E18.8E3)" !pas adapted en cas de changement de N_BOD !!!
 
 !------------------------------
 !          main loop
@@ -31,22 +34,26 @@ ftime = STEP
 
 print*, "Let's rock, folks."
 
-open(10,file='results.dat',status='unknown')
+open(10,file='ipms.dat',status='unknown')!intégrales premières
+open(20,file='traj.dat',status='unknown')!positions
 open(16,file='out_everhart.dat')
 
 write(10,*) "# time              Etot              Ltot"
-write(10,"(3E18.8E3)") ftime, Etot, Ltot
-
+write(10,OFMT1) ftime, Etot, Ltot
+write(20,OFMT2) Positions
 i=0
 do while (itime < TMAX)
    i = i+1
    if (mod(i,int(1e2)) .eq. 0) then 
-       print*,"t =",itime," , Etot =", Etot," , Ltot =", Ltot
+   !    print *,"t =",int(itime)," , Etot =", Etot," , Ltot =", Ltot
+      write(20,OFMT2) Positions
    end if
+   !print*,sqrt(sum(Positions(10:12)**2))
+
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(10,"(3E18.8E3)") ftime, Etot, Ltot
+   write(10,OFMT1) ftime, Etot, Ltot
    itime = ftime
    ftime = ftime + STEP
 end do

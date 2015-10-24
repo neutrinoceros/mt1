@@ -12,7 +12,7 @@ subroutine Forces(X, V, time, F)
   !local
   integer :: i,j,k,ii,jj
   real(8) :: D !distance
-  real(8),dimension(3) :: diffpos,dF!relative position, contribution to force on a body. tmp variables.
+  real(8),dimension(3) :: diffpos, dF!relative position, contribution to force on a body. tmp variables.
   
   F(:) = 0
   do i=1,N_BOD
@@ -20,8 +20,9 @@ subroutine Forces(X, V, time, F)
      do j=i+1,N_BOD
         jj = 3*(j-1)+1
         diffpos = X(ii:ii+3)-X(jj:jj+3)
-        D = sum(diffpos)
-        dF = GCST*Masses(j) / D**3 * (X(ii:ii+3) - X(jj:jj+3))
+        D = sqrt(sum(diffpos**2))
+        !print*, "i = ",i, "j = ",j,diffpos!"D = ",D
+        dF = GCST * Masses(j) * diffpos / D**3
         F(ii:ii+3) = F(ii:ii+3) - dF
         F(jj:jj+3) = F(jj:jj+3) + dF
         !note that those are forces *by units of mass*, ie accelerations.
@@ -52,7 +53,7 @@ subroutine Energy(P, V, time, En)
      ii = 3*(i-1)+1
      modsquareV(i) = sum(V(ii:ii+3)**2)
   end do
-  T = 1./2 * sum(MASSES*modsquareV)
+  T = 1./2 * sum(MASSES(1:N_BOD)*modsquareV)
 
   !potential energy computation
   U = 0

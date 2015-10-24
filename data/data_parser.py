@@ -9,6 +9,11 @@ with open("table5.dat",'r') as flux :
 with open("table8.dat",'r') as flux :
     text2 = '\n'.join(flux.readlines()).replace('–','-')
 
+with open("../modules/data_parameters.f90",'r') as flux :
+    text3 = '\n'.join(flux.readlines())
+
+n_bod = int(re.findall("N_BOD += +\d+",text3)[0].split("=")[1])
+
 name = r"[A-Z][a-z]+"
 n  = r'-?\d+\.\d+'
 powers = r'E-\d+'
@@ -25,7 +30,7 @@ VEL = [POSVEL[i] for i in range(len(POSVEL)) if i%6>=3]
 
 
 table = ''
-for i in range(11) :
+for i in range(n_bod) :
     table += '#'+NAMES[i]+'\n'
     table += MASSES[i]+'\n'
     table += '    '.join(POS[3*i:3*i+3])+'\n'
@@ -41,26 +46,28 @@ with open('icplanets.dat','w') as flux :
 #   write data_planets.f90 module
 #-----------------------------------
 
-dm = 'module data_planets \n\n\treal(8),parameter,dimension(11) :: MASSES=(/ &\n'
-for i in range(11) :
+dm = 'module data_planets \n\n'
+dm += 'use data_parameters\n'
+dm += '\treal(8),parameter,dimension(N_BOD) :: MASSES=(/ &\n'
+for i in range(n_bod) :
     dm += '\t\t'+MASSES[i]
-    if i <10 :
+    if i < n_bod - 1 :
         dm += ',&\n'
     else :
         dm += '/)\n\n'
 
-dm += '\treal(8),parameter,dimension(3*11) :: IPOSITIONS=(/ &\n'
-for i in range(11) :
+dm += '\treal(8),parameter,dimension(3*N_BOD) :: IPOSITIONS=(/ &\n'
+for i in range(n_bod) :
     dm += '\t\t'+','.join(POS[3*i:3*i+3])
-    if i <10 :
+    if i < n_bod - 1 :
         dm += ',&\n'
     else :
         dm += '/)\n\n'
 
-dm += '\treal(8),dimension(3*11),parameter :: IVELOCITIES=(/ &\n'
-for i in range(11) :
+dm += '\treal(8),dimension(3*N_BOD),parameter :: IVELOCITIES=(/ &\n'
+for i in range(n_bod) :
     dm += '\t\t'+','.join(VEL[3*i:3*i+3])
-    if i <10 :
+    if i < n_bod - 1 :
         dm += ',&\n'
     else :
         dm += '/)\n'
