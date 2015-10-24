@@ -32,6 +32,7 @@ ax.set_aspect(1)
 #ax.set_xlim(-1.5,1.5)
 #ax.set_ylim(-1.5,1.5)
 
+ax.set_title('integration over 6 mounths with 7 bodies', size=15)
 ax.set_xlabel(r'$x$ (a.u.)',size=20)
 ax.set_ylabel(r'$y$ (a.u.)',size=20)
 ax.set_aspect('equal','datalim')
