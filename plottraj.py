@@ -38,8 +38,20 @@ ax.set_ylabel(r'$y$ (a.u.)',size=20)
 ax.set_aspect('equal','datalim')
 pl.legend(loc=2,frameon=False)
 
-for ext in ['pdf','png'] :
-    fig.savefig('./img/6m7bodies.'+ext)
-    fig.savefig('./img/6m7bodies_t.'+ext,transparent=True)
+
+saveB=raw_input('save img ? ((y)/n) :    ')
+if saveB in 'Yy' or saveB == '' :
+    confirm = False
+    while not confirm :        
+        imgname =  raw_input('enter img name :    ')
+        raw_conf = raw_input("""do you confirm '{}' ? ((y)/n) :    """.format(imgname))
+        print raw_conf
+        if raw_conf in 'Yy' or raw_conf == '' :
+            confirm = True
+
+    for ext in ['.pdf','.png'] :
+        fig.savefig('./img/'+imgname+ext)
+        fig.savefig('./img/'+imgname+'_t.'+ext,transparent=True)
+
     
 ex=raw_input("type 'enter' to exit program :    ")
