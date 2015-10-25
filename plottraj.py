@@ -4,6 +4,18 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pylab as pl
 
+def ask(question):
+    confirm = False
+    while not confirm :        
+        entry =  raw_input(question)
+        raw_conf = raw_input("""do you confirm '{}' ? ((y)/n) :    """.format(entry))
+        print raw_conf
+        if raw_conf in 'Yy' or raw_conf == '' :
+            confirm = True
+    return entry
+
+
+
 tab=np.loadtxt("./results/traj.dat")
 threed=False
 
@@ -32,7 +44,9 @@ ax.set_aspect(1)
 #ax.set_xlim(-1.5,1.5)
 #ax.set_ylim(-1.5,1.5)
 
-ax.set_title('integration over 6 mounths with 7 bodies', size=15)
+plttitle=ask('plot title ?    ')
+
+ax.set_title(plttitle, size=15)
 ax.set_xlabel(r'$x$ (a.u.)',size=20)
 ax.set_ylabel(r'$y$ (a.u.)',size=20)
 ax.set_aspect('equal','datalim')
@@ -41,14 +55,7 @@ pl.legend(loc=2,frameon=False)
 
 saveB=raw_input('save img ? ((y)/n) :    ')
 if saveB in 'Yy' or saveB == '' :
-    confirm = False
-    while not confirm :        
-        imgname =  raw_input('enter img name :    ')
-        raw_conf = raw_input("""do you confirm '{}' ? ((y)/n) :    """.format(imgname))
-        print raw_conf
-        if raw_conf in 'Yy' or raw_conf == '' :
-            confirm = True
-
+    imgname=ask('enter image name :    ')
     for ext in ['.pdf','.png'] :
         fig.savefig('./img/'+imgname+ext)
         fig.savefig('./img/'+imgname+'_t.'+ext,transparent=True)

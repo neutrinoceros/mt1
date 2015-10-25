@@ -2,7 +2,7 @@ import numpy as np
 import pylab as pl
 
 
-dataf="results.dat"
+dataf="results/ipms.dat"
 tab=np.loadtxt(dataf)
 t,e,l=tab[:,0],tab[:,1],tab[:,2]
 
@@ -19,6 +19,6 @@ ax1.set_xlabel(r'$t$',size=20)
 for ax,ylabel,i,qty in zip([ax1,ax2],[r'$E(t)$',r'$L(t)$'],range(2,4),[e,l]) :
     ax.set_ylabel(ylabel,size=20)
     ax.legend(loc=i)
-    if max(qty) > 100 * min(qty) and min(qty)*max(qty) > 0 :
-        ax.set_yscale('log')
+#    if max(qty) > 100 * min(qty) and min(qty)*max(qty) > 0 :
+#        ax.set_yscale('log')
 pl.show()
