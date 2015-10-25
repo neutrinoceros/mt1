@@ -7,13 +7,15 @@ use data_planets !initial conditions + masses
 
 implicit none
 real(8),dimension(:),allocatable :: Positions, Velocities
-integer :: i=0
+integer :: i,j
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 character(len=30) :: OFMT1,OFMT2
+character(2000) :: ch
 
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
+
 
 !------------------------------
 !             init
@@ -35,13 +37,15 @@ print*, 'bodies used are : ',NAMES
 
 print*, "Let's rock, folks."
 
-open(10,file='results/ipms.dat',status='unknown')!intégrales premières
-open(20,file='results/traj.dat',status='unknown')!positions
-open(16,file='results/out_everhart.dat')
+open(10,file='results/ipms.dat',status='replace')!intégrales premières
+!open(20,file='results/traj.dat',access='direct',form='unformatted',status='replace',recl=rl)!positions
+open(20,file='results/traj.dat',status='replace')!positions
+open(16,file='results/out_everhart.dat',status='replace')
 
 write(10,*) "# time              Etot              Ltot"
 write(10,OFMT1) ftime, Etot, Ltot
 write(20,OFMT2) Positions
+stop 'wait a sec...'
 i=0
 do while (itime < TMAX)
    i = i+1
@@ -51,6 +55,8 @@ do while (itime < TMAX)
       !print *,"t =",int(itime)," , Etot =", Etot," , Ltot =", Ltot
       !print*, Positions(4:6), Velocities(4:6) !mercury
       write(20,OFMT2) Positions
+      !print*, Positions
+      !stop
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
