@@ -35,9 +35,9 @@ print*, 'bodies used are : ',NAMES
 
 print*, "Let's rock, folks."
 
-open(10,file='ipms.dat',status='unknown')!intégrales premières
-open(20,file='traj.dat',status='unknown')!positions
-open(16,file='out_everhart.dat')
+open(10,file='results/ipms.dat',status='unknown')!intégrales premières
+open(20,file='results/traj.dat',status='unknown')!positions
+open(16,file='results/out_everhart.dat')
 
 write(10,*) "# time              Etot              Ltot"
 write(10,OFMT1) ftime, Etot, Ltot

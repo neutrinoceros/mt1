@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pylab as pl
 
-tab=np.loadtxt("traj.dat")
+tab=np.loadtxt("./results/traj.dat")
 threed=False
 
 pl.ion()
