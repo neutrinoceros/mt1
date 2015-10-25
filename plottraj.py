@@ -17,7 +17,10 @@ def ask(question):
 
 
 tab=np.loadtxt("./results/traj.dat")
-threed=False
+threed=True
+raw_3D=raw_input('use 3D ? (y/(n)) :    ') 
+if raw_3D in 'nN' or raw_3D == '' :
+    threed=False
 
 pl.ion()
 
@@ -36,9 +39,11 @@ for n,c,name in zip(range(n_bod),colors,names) :
     #    x,y,z = tab[:,3*n]-tab[:,0] , tab[:,3*n+1]-tab[:,1] , tab[:,3*n+2]-tab[:,2]
     x,y,z = tab[:,3*n],tab[:,3*n+1],tab[:,3*n+2]
     if threed :
-        ax.scatter(x,y,z,color=c,edgecolor='k',label=name)
+        ax.plot(x,y,z,lw=3,alpha=0.6,color=c,label=name)
+        ax.scatter(x[-1],y[-1],z[-1],color=c,edgecolor='k')
     else :
         ax.plot(x,y,lw=3,alpha=0.6,color=c,label=name)
+        ax.scatter(x[-1],y[-1],color=c,edgecolor='k')
 
 ax.set_aspect(1)
 #ax.set_xlim(-1.5,1.5)
@@ -50,7 +55,8 @@ ax.set_title(plttitle, size=15)
 ax.set_xlabel(r'$x$ (a.u.)',size=20)
 ax.set_ylabel(r'$y$ (a.u.)',size=20)
 ax.set_aspect('equal','datalim')
-pl.legend(loc=2,frameon=False)
+if not threed :
+    pl.legend(loc=2,frameon=False)
 
 
 saveB=raw_input('save img ? ((y)/n) :    ')
@@ -58,7 +64,7 @@ if saveB in 'Yy' or saveB == '' :
     imgname=ask('enter image name :    ')
     for ext in ['.pdf','.png'] :
         fig.savefig('./img/'+imgname+ext)
-        fig.savefig('./img/'+imgname+'_t.'+ext,transparent=True)
+        fig.savefig('./img/'+imgname+'_t'+ext,transparent=True)
 
     
 ex=raw_input("type 'enter' to exit program :    ")
