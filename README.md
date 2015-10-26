@@ -1,7 +1,7 @@
 # mt1
 N bodies scholar collaboration project in fortran90. Work under progress.
 
-**Authors** : Clémnent Robert (clement.robert@protonmail.com) & Riwan Kherouf, supervised by Valery Lainey
+**Authors** : Clémnent Robert (clement.robert@protonmail.com) & Riwan Kherouf (kherouf@crans.org), supervised by Valery Lainey
 
 ![illustration](img/6m7bodies_t.png?raw=true)
 
