@@ -38,11 +38,9 @@ Learn numerical methods for ephemerids computations.
 
 * ~~none of the planets ever move except for the sun, which trajectory is not even a straight line and depends on integration parameters~~
 * ~~check use of RADAU and computations made in subroutine Forces~~
-* verify computation of Energy and AMomentum
+* check angular momentum and energy computations
 * ~~plottraj.py scripts fails if we use more than 7 bodies (probably an issue in fortran when writing column-heavy files)~~
-* The Moon is not correctly initialized (in the middle of the sun, currently...)
-* There is a confusion between Uranus and Pluto at the moment (still an initialization issue surely)
-
+* ~~the moon is not initialized correctly~~
 
 **mandatory**
 
