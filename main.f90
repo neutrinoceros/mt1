@@ -7,11 +7,10 @@ use data_planets !initial conditions + masses
 
 implicit none
 real(8),dimension(:),allocatable :: Positions, Velocities
-integer :: i,j
+integer :: i!,j
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 character(len=30) :: OFMT1,OFMT2
-character(2000) :: ch
 
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
@@ -28,7 +27,7 @@ call AMomentum(Positions, Velocities, ftime, Ltot)
 itime = 0.
 ftime = STEP
 OFMT1 = "(3E18.8E3)"
-OFMT2 = "(22E18.8E3)"
+OFMT2 = "(33E18.8E3)"
 
 print*, 'bodies used are : ',NAMES
 !------------------------------
@@ -45,7 +44,7 @@ open(16,file='results/out_everhart.dat',status='replace')
 write(10,*) "# time              Etot              Ltot"
 write(10,OFMT1) ftime, Etot, Ltot
 write(20,OFMT2) Positions
-stop 'wait a sec...'
+!stop 'wait a sec...'
 i=0
 do while (itime < TMAX)
    i = i+1
@@ -55,8 +54,6 @@ do while (itime < TMAX)
       !print *,"t =",int(itime)," , Etot =", Etot," , Ltot =", Ltot
       !print*, Positions(4:6), Velocities(4:6) !mercury
       write(20,OFMT2) Positions
-      !print*, Positions
-      !stop
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
@@ -94,7 +91,6 @@ subroutine walk(X, V, itime, ftime)
 !     RA15M(X,V,TD,   TF0,  XL,LL,NV,NCLASS,NOR,nsor,FORCE ,SORTIE   )  
  call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,AMomentum)
 end subroutine walk
-
 
 ! subroutine loadIC(M, IP, IV)
 !   !useless

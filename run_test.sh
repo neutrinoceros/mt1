@@ -3,5 +3,5 @@
 ./compil.sh
 ./program
 
-wc results/traj.dat 
-#ipython plottraj.py
+#wc results/traj.dat 
+ipython plottraj.py
