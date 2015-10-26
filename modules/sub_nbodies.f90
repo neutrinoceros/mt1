@@ -86,11 +86,13 @@ subroutine AMomentum(P, V, time, L)
   real(8),dimension(3*N_BOD) :: Ltmp
   integer :: i,ii
 
+  L = 0
   do i=1,N_BOD
      ii = 3*(i-1)+1
      Ltmp(ii:ii+2) = Masses(i) * cross(V(ii:ii+2),P(ii:ii+2))
-  end do                                    
-  L = sqrt(sum(Ltmp(ii:ii+2)**2))
+     L = L + sum(Ltmp(ii:ii+2)**2)
+  end do                     
+  L = sqrt(L)
 end subroutine AMomentum
 
 
