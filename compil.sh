@@ -4,6 +4,8 @@ cd data
 python data_parser.py
 cd ../
 
+# test if f95 exists, else try gfortran, else print "no compiler"
+
 COMPILER="f95"
 TARGET="program"
 MAIN="main.f90"
