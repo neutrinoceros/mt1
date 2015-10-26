@@ -1,6 +1,6 @@
 module data_parameters
 
-integer,parameter :: N_BOD = 8
+integer,parameter :: N_BOD = 7
 real(8),parameter :: GCST = 1.50528915669e-17 !gravitational constant, here in SAD units (Solar mass, Astronomical unit, Day)
                                              !conversion from SI is done in convtool.py script
 

@@ -21,8 +21,8 @@ allocate(Velocities(3*N_BOD))
 !             init
 !------------------------------
 print*, "Initializing."
-Positions = IPositions
-Velocities = IVelocities
+Positions = IPOSITIONS
+Velocities = IVELOCITIES
 call Energy(Positions, Velocities, ftime, Etot)
 call AMomentum(Positions, Velocities, ftime, Ltot)
 itime = 0.
