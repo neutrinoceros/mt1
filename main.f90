@@ -44,15 +44,12 @@ open(16,file='results/out_everhart.dat',status='replace')
 write(10,*) "# time              Etot              Ltot"
 write(10,OFMT1) ftime, Etot, Ltot
 write(20,OFMT2) Positions
-!stop 'wait a sec...'
 i=0
 do while (itime < TMAX)
    i = i+1
    !print*,"in main : i=",i
    !print*,
    if (mod(i,int(1e1)) .eq. 0) then 
-      !print *,"t =",int(itime)," , Etot =", Etot," , Ltot =", Ltot
-      !print*, Positions(4:6), Velocities(4:6) !mercury
       write(20,OFMT2) Positions
    end if
    call walk(Positions, Velocities, itime, ftime)

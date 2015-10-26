@@ -30,7 +30,6 @@ VEL = [POSVEL[i] for i in range(len(POSVEL)) if i%6>=3]
 
 if n_bod == 11 : #if the moon is included
     for i in range(30,33) :
-        print POS[i],POS[i-21]
         POS[i] = str(float(POS[i]) + float(POS[i-21]))
         VEL[i] = str(float(VEL[i]) + float(VEL[i-21]))
 
