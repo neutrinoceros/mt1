@@ -4,67 +4,89 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pylab as pl
 
+
 def ask(question):
     confirm = False
     while not confirm :        
         entry =  raw_input(question)
         raw_conf = raw_input("""do you confirm '{}' ? ((y)/n) :    """.format(entry))
-        print raw_conf
         if raw_conf in 'Yy' or raw_conf == '' :
             confirm = True
     return entry
 
+#------------------------------
+#       local parameters
+#------------------------------
 
+NAMES  = ['Sun','Mercury','Venus','Earth','Mars','Jupiter','Saturn'     ,'Uranus'        ,'Neptune'  ,'Pluto'     ,'Moon']
+COLORS = ['y'  ,'m'      ,'g'    ,'b'    ,'r'   ,'orange' ,'rosybrown'  ,'darkseagreen'  ,'royalblue','firebrick' ,'k'   ]
+ALPHA  = 0.8 #partial opacity of lines in plot
+SIZE   = 20  #ax label's size
+LS     = '-' #line style
+LW     = 3   #line width
 
-tab=np.loadtxt("./results/traj.dat")
-threed=True
-raw_3D=raw_input('use 3D ? (y/(n)) :    ') 
-if raw_3D in 'nN' or raw_3D == '' :
-    threed=False
+#------------------------------
+#        data loading
+#------------------------------
+
+tab   = np.loadtxt("./results/traj.dat")
+n_bod = tab.shape[1]/3
+
+raw_2D=raw_input('use 2D projection ? ((y)/n) :    ') 
+if raw_2D in 'yY' :
+    threed = False
+else :
+    threed = True
+
+#------------------------------
+#          plotting
+#------------------------------
 
 pl.ion()
-
 if threed :
     fig = pl.figure()
-    ax = fig.gca(projection='3d')
+    ax  = fig.gca(projection='3d')
 
 else :
     fig,ax=pl.subplots()
 
-n_bod = tab.shape[1]/3
-names =['Sun','Mercury','Venus','Earth','Mars','Jupiter','Saturn'     ,'Uranus','Neptune'  ,'Pluto','Moon'  ]
-colors=['y'  ,'m'      ,'g'    ,'b'    ,'r'   ,'orange' ,'rosybrown'  ,'plum'  ,'royalblue','pink' ,'silver']
+for n,c,name in zip(range(n_bod),COLORS,NAMES) :
+    if name != 'Moon' :
+        ls = LS
+        lw = LW
+    else :
+        ls = '--'
+        lw = 1
 
-for n,c,name in zip(range(n_bod),colors,names) :
-    #    x,y,z = tab[:,3*n]-tab[:,0] , tab[:,3*n+1]-tab[:,1] , tab[:,3*n+2]-tab[:,2]
     x,y,z = tab[:,3*n],tab[:,3*n+1],tab[:,3*n+2]
     if threed :
-        ax.plot(x,y,z,lw=3,alpha=0.6,color=c,label=name)
+        ax.plot(x,y,z,lw=lw,alpha=ALPHA,ls=ls,color=c,label=name)
         ax.scatter(x[-1],y[-1],z[-1],color=c,edgecolor='k')
     else :
-        ax.plot(x,y,lw=3,alpha=0.6,color=c,label=name)
+        ax.plot(x,y,lw=lw,alpha=ALPHA,ls=ls,color=c,label=name)
         ax.scatter(x[-1],y[-1],color=c,edgecolor='k')
-
-ax.set_aspect(1)
-#ax.set_xlim(-1.5,1.5)
-#ax.set_ylim(-1.5,1.5)
 
 plttitle=ask('plot title ?    ')
 
 ax.set_title(plttitle, size=15)
-ax.set_xlabel(r'$x$ (a.u.)',size=20)
-ax.set_ylabel(r'$y$ (a.u.)',size=20)
+ax.set_xlabel(r'$x$ (a.u.)',size=SIZE)
+ax.set_ylabel(r'$y$ (a.u.)',size=SIZE)
+if threed :
+    ax.set_zlabel(r'$z$ (a.u.)',size=SIZE)
 ax.set_aspect('equal','datalim')
-if not threed :
-    pl.legend(loc=2,frameon=False)
 
+ax.legend(loc=2)
+pl.legend(frameon=False)
 
-saveB=raw_input('save img ? ((y)/n) :    ')
-if saveB in 'Yy' or saveB == '' :
+#------------------------------
+#      saving (optional)
+#------------------------------
+
+saveB=raw_input('save img ? (y/(n)) :    ')
+if saveB in 'yY' and saveB != '' :
     imgname=ask('enter image name :    ')
     for ext in ['.pdf','.png'] :
         fig.savefig('./img/'+imgname+ext)
         fig.savefig('./img/'+imgname+'_t'+ext,transparent=True)
 
-    
 ex=raw_input("type 'enter' to exit program :    ")
