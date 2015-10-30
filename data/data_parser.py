@@ -18,12 +18,19 @@ name = r"[A-Z][a-z]+"
 n  = r'-?\d+\.\d+'
 powers = r'E-\d+'
 
-NAMES = re.findall(name,text2)
+NAMES  = re.findall(name,text2)
 POSVEL = re.findall(n, text)
 POWERS = re.findall(powers, text2)
-GMS = re.findall(n, text2)
-MASSES = [str(float(GMS[i])/GSAD) for i in range(len(GMS)) if (i-3)%3==0]
-MASSES = [str(float(m)*float('1'+p)) for m,p in zip(MASSES,POWERS)]
+GMS    = re.findall(n, text2)
+
+#-----------------------------------------------------------------------------
+# problème de normalisation, current code does the trick
+
+
+#MASSES = [str(float(GMS[i])/GSAD) for i in range(len(GMS)) if (i-3)%3==0]
+#MASSES = [str(float(m)*float('1'+p)) for m,p in zip(MASSES,POWERS)]
+MASSES = [str(1./float(GMS[i])) for i in range(len(GMS)) if i%3==1]
+#-----------------------------------------------------------------------------
 
 POS = [POSVEL[i] for i in range(len(POSVEL)) if i%6<3 ]
 VEL = [POSVEL[i] for i in range(len(POSVEL)) if i%6>=3]

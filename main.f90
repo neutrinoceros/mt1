@@ -25,8 +25,8 @@ Velocities = IVELOCITIES
 call Energy(Positions, Velocities, ftime, Etot)
 call AMomentum(Positions, Velocities, ftime, Ltot)
 itime = 0.
-ftime = STEP
-OFMT1 = "(3E18.8E3)"
+ftime = STEP2
+OFMT1 = "(3E30.16E3)"
 OFMT2 = "(33E18.8E3)"
 
 print*, 'bodies used are : ',NAMES
@@ -47,18 +47,32 @@ write(20,OFMT2) Positions
 i=0
 do while (itime < TMAX)
    i = i+1
-   !print*,"in main : i=",i
-   !print*,
-   if (mod(i,int(1e1)) .eq. 0) then 
-      write(20,OFMT2) Positions
-   end if
+!   if (mod(i,int(1e1)) .eq. 0) then 
+   write(20,OFMT2) Positions
+!   end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(10,OFMT1) ftime, Etot, Ltot
-   itime = itime + STEP
-   ftime = ftime + STEP
+   itime = itime + STEP2
+   ftime = ftime + STEP2
 end do
+
+
+! i=0
+! do while (ftime > 0)
+!    i = i+1
+!    if (mod(i,int(1e1)) .eq. 0) then 
+!       write(20,OFMT2) Positions
+!    end if
+!    call walk(Positions, Velocities, itime, ftime)
+!    call Energy(Positions, Velocities, ftime, Etot)
+!    call AMomentum(Positions, Velocities, ftime, Ltot)
+!    write(10,OFMT1) ftime, Etot, Ltot
+!    itime = itime - STEP
+!    ftime = ftime - STEP
+! end do
+
 close(10)
 close(16)
 
@@ -79,7 +93,7 @@ subroutine walk(X, V, itime, ftime)
   real(8) :: xl
   integer :: ll,nv,nclass,nor,nsor !probably not all integers...
 
-  xl = .05D0 !time step size
+  xl = STEP !time step size
   ll = -1   !if < 0 : constant step, elif > 0 : tolerance à la troncature numérique (1e-12 chez Valéry) 
   nv = 3*N_BOD !number of simultaneous diff eq
   nclass = -2 !ode form is "y''=F(y,t)"

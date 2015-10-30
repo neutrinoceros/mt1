@@ -57,14 +57,14 @@ subroutine Energy(P, V, time, En)
 
   !potential energy computation
   U = 0
-  do i=1,N_BOD
+  do i=1,N_BOD-1
      ii = 3*(i-1)+1
      do j=i+1,N_BOD
         jj = 3*(j-1)+1
         diffpos = (P(ii:ii+2)-P(jj:jj+2))
-        d = abs(sum(diffpos))
+        d = sqrt(sum(diffpos**2))
         dU = MASSES(i) * MASSES(j) / d
-        U  = U + 2D0*dU
+        U  = U + dU
      end do
   end do
   U  = -U * GCST
@@ -98,11 +98,11 @@ subroutine AMomentum(P, V, time, L)
      Lpercent(i) = sqrt(sum(Ltmp(ii:ii+2)**2))
   end do     
   
-  sum_L = sum(Lpercent)
-  do i=1,N_BOD
-     Lpercent(i) = int(Lpercent(i) / sum_L * 1e6) /1e4
-     print*,NAMES(i), Lpercent(i)
-  end do
+  ! sum_L = sum(Lpercent)
+  ! do i=1,N_BOD
+  !    Lpercent(i) = int(Lpercent(i) / sum_L * 1e6) /1e4
+  !    print*,NAMES(i), Lpercent(i)
+  ! end do
   L = sqrt(sum(LVect**2))
 !  L = sqrt(sum(Ltmp(16:18)**2))
 end subroutine AMomentum

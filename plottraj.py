@@ -59,6 +59,7 @@ for n,c,name in zip(range(n_bod),COLORS,NAMES) :
         lw = 1
 
     x,y,z = tab[:,3*n],tab[:,3*n+1],tab[:,3*n+2]
+    x,y,z = tab[:,3*n]-tab[:,0] , tab[:,3*n+1]-tab[:,1] , tab[:,3*n+2] - tab[:,1]
     if threed :
         ax.plot(x,y,z,lw=lw,alpha=ALPHA,ls=ls,color=c,label=name)
         ax.scatter(x[-1],y[-1],z[-1],color=c,edgecolor='k')

@@ -5,3 +5,4 @@
 
 #wc results/traj.dat 
 ipython plottraj.py
+ipython plotres.py
