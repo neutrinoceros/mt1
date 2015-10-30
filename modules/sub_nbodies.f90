@@ -53,7 +53,7 @@ subroutine Energy(P, V, time, En)
      ii = 3*(i-1)+1
      modsquareV(i) = sum(V(ii:ii+2)**2)
   end do
-  T = 1./2 * sum(MASSES(1:N_BOD)*modsquareV)
+  T = .5D0 * sum(MASSES(1:N_BOD)*modsquareV)
 
   !potential energy computation
   U = 0
@@ -64,7 +64,7 @@ subroutine Energy(P, V, time, En)
         diffpos = (P(ii:ii+2)-P(jj:jj+2))
         d = abs(sum(diffpos))
         dU = MASSES(i) * MASSES(j) / d
-        U  = U + 2*dU
+        U  = U + 2D0*dU
      end do
   end do
   U  = -U * GCST
@@ -83,16 +83,28 @@ subroutine AMomentum(P, V, time, L)
   !output
   real(8) :: L!total angular momentum (scalar)
   !local
+  real(8),dimension(3) :: LVect 
   real(8),dimension(3*N_BOD) :: Ltmp
+  real(8),dimension(N_BOD) :: Lpercent
+  real(8) :: sum_L
   integer :: i,ii
 
-  L = 0
+  LVect(:) = 0
   do i=1,N_BOD
      ii = 3*(i-1)+1
      Ltmp(ii:ii+2) = Masses(i) * cross(V(ii:ii+2),P(ii:ii+2))
-     L = L + sum(Ltmp(ii:ii+2)**2)
-  end do                     
-  L = sqrt(L)
+     LVect(1:3) = LVect(1:3) + Ltmp(ii:ii+2)
+
+     Lpercent(i) = sqrt(sum(Ltmp(ii:ii+2)**2))
+  end do     
+  
+  sum_L = sum(Lpercent)
+  do i=1,N_BOD
+     Lpercent(i) = int(Lpercent(i) / sum_L * 1e6) /1e4
+     print*,NAMES(i), Lpercent(i)
+  end do
+  L = sqrt(sum(LVect**2))
+!  L = sqrt(sum(Ltmp(16:18)**2))
 end subroutine AMomentum
 
 
