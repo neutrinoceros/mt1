@@ -79,14 +79,14 @@ subroutine walk(X, V, itime, ftime)
   real(8) :: xl
   integer :: ll,nv,nclass,nor,nsor !probably not all integers...
 
-  xl = 1 !time step size
-  ll = -1 !if < 0 : constant step, elif > 0 : tolerance à la troncature numérique (1e-12 chez Valéry) 
+  xl = .05D0 !time step size
+  ll = -1   !if < 0 : constant step, elif > 0 : tolerance à la troncature numérique (1e-12 chez Valéry) 
   nv = 3*N_BOD !number of simultaneous diff eq
   nclass = -2 !ode form is "y''=F(y,t)"
   nor = 1 !useless here (commented)
   nsor = 1 !refresh sortie (angular momentum) every nsor step
 !     RA15M(X,V,TD,   TF0,  XL,LL,NV,NCLASS,NOR,nsor,FORCE ,SORTIE   )  
- call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,AMomentum)
+ call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,Energy)
 end subroutine walk
 
 ! subroutine loadIC(M, IP, IV)

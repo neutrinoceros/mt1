@@ -10,6 +10,9 @@ N bodies scholar collaboration project in fortran90. Work under progress.
 
 Learn numerical methods for ephemerids computations.
 
+##Documentation used
+available at https://www.dropbox.com/sh/48ggibduzgidf6v/AAB1_qRgjvUp0z6cd0Wd-8Wna?dl=0
+
 ##Git Memento
 **get the code**
   
