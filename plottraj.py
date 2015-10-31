@@ -1,18 +1,6 @@
 #-*-coding:utf-8-*-
 
-from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
-import pylab as pl
-
-
-def ask(question):
-    confirm = False
-    while not confirm :        
-        entry =  raw_input(question)
-        raw_conf = raw_input("""do you confirm '{}' ? ((y)/n) :    """.format(entry))
-        if raw_conf in 'Yy' or raw_conf == '' :
-            confirm = True
-    return entry
+from pybox import *
 
 #------------------------------
 #       local parameters
@@ -85,9 +73,6 @@ pl.legend(frameon=False)
 
 saveB=raw_input('save img ? (y/(n)) :    ')
 if saveB in 'yY' and saveB != '' :
-    imgname=ask('enter image name :    ')
-    for ext in ['.pdf','.png'] :
-        fig.savefig('./img/'+imgname+ext)
-        fig.savefig('./img/'+imgname+'_t'+ext,transparent=True)
+    saveimg(fig)
 
 ex=raw_input("type 'enter' to exit program :    ")
