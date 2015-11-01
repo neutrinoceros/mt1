@@ -35,28 +35,32 @@ available on [Dropbox](https://www.dropbox.com/sh/48ggibduzgidf6v/AAB1_qRgjvUp0z
     $ git commit -m "[short descritpion of the changes]"
     $ git push origin master
 
-**SPICE**
+##SPICE library
 
-Site : http://naif.jpl.nasa.gov/naif/data_generic.html
-Toolkit : lib spice
-Data : de430 ephemeris
-path : MT1-ressources   /toolkit/lib/spicelib.a     : 
-                        /data/de430                 : données de430, DL at http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/
+* Site    : [naif.jpl.nasa.gov](http://naif.jpl.nasa.gov/naif/data_generic.html)
+* Toolkit : lib spice
+* Data    : de430 ephemeris
+* path    : 
+     -  MT1-ressources  /toolkit/lib/spicelib.a     : 
+     -  /data/de430 données de430, DL at [naif.jpl.nasa.gov](http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/)
 
-NAIF integer code ID : http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/naif_ids.html
-instructions :
+NAIF integer code ID : [naif.jpl.nasa.gov](http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/naif_ids.html)
 
-    CALL FURNSH('PATH/di') gfortran xxx.f90 $PATH/lib/spicelib.a
+**instructions**
+
+  ```fortran
+    call FURNSH('PATH/di') gfortran xxx.f90 $PATH/lib/spicelib.a
     Do i=1..
-        CALL SPKEZR(ET,target,FRAME,OBS,ABCORR,STATE,LT)
-            # ET    : date : [(date+date_ini_JJ)-2451545.do]*86400.do
-            # target: name body 'venus','mercury'
-            # FRAME : 'J2000'
-            # OSB   : 'SOLAR SYSTEM BARYCENTER'
-            # ABCORR: 'NONE'
-            # STATE : 'km day km/jday' (vecteur qui concerne uniquement l'objet qui nous intéresse)
-            # LT    : Light time (osef)
-
+        call SPKEZR(ET,target,FRAME,OBS,ABCORR,STATE,LT)
+        ! ET    : date : [(date+date_ini_JJ)-2451545.do]*86400.do
+        ! target: name body 'venus','mercury'
+        ! FRAME : 'J2000'
+        ! OSB   : 'SOLAR SYSTEM BARYCENTER'
+        ! ABCORR: 'NONE'
+        ! STATE : 'km day km/jday' (vecteur qui concerne uniquement l'objet qui nous intéresse)
+        ! LT    : Light time       (useless to us)
+  ```
+  
 ##To do
 
 **debbuging**
@@ -83,7 +87,4 @@ instructions :
 
 * [ ] write a decent Makefile (compilation is currently crudely made with a hard-to-edit shell script compil.sh)
 * [ ] check conservation of (a,e,i,omega,Omega,M(t)) for a 2 bodies pb (Sun + Mercury)
-* [ ] use double precision
-
-
-
+* [x] use double precision
