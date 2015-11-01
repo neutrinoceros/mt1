@@ -3,13 +3,13 @@
 import re
 from convtool import *
 
-with open("table5.dat",'r') as flux :
+with open("data/table5.dat",'r') as flux :
     text = '\n'.join(flux.readlines()).replace('–','-')
 
-with open("table8.dat",'r') as flux :
+with open("data/table8.dat",'r') as flux :
     text2 = '\n'.join(flux.readlines()).replace('–','-')
 
-with open("../modules/data_parameters.f90",'r') as flux :
+with open("./modules/parameters.f90",'r') as flux :
     text3 = '\n'.join(flux.readlines())
 
 n_bod = int(re.findall("N_BOD += +\d+",text3)[0].split("=")[1])
@@ -50,7 +50,7 @@ for i in range(n_bod) :
     table += '\n'
 #print table
 
-with open('icplanets.dat','w') as flux :
+with open('data/icplanets.dat','w') as flux :
     flux.write(table)
 
 
@@ -98,5 +98,5 @@ for i in range(n_bod) :
         dm += '/)\n'
 
 dm += '\nend module data_planets\n'
-with open('../modules/data_planets.f90','w') as flux :
+with open('./modules/data_planets.f90','w') as flux :
     flux.write(dm)

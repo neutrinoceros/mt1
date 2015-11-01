@@ -38,9 +38,9 @@ real(8),parameter :: GCST  = 0.2959122082855911e-3
 !  * 6mounths = 182 days
 !----------------------------------------------------------------------
 
-real(8),parameter :: ISTEP      = 1D0  
-real(8),parameter :: SSTEP      = 10D0 
+real(8),parameter :: ISTEP      = 2D0  
+real(8),parameter :: SSTEP      = 2D0 
 real(8),parameter :: TMAX       = 50*88
-integer,parameter :: SAMPLERATE = 10 
+integer,parameter :: SAMPLERATE = 1 
 
 end module data_parameters

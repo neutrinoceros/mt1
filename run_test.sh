@@ -4,5 +4,5 @@
 ./program
 
 #wc results/traj.dat 
-ipython plottraj.py
-ipython plotres.py
+ipython pyplot/traj.py
+ipython pyplot/ipms.py
