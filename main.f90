@@ -2,7 +2,7 @@ program ephemerids
 
 use maths
 use sub_nbodies
-use data_parameters
+use parameters
 use data_planets !initial conditions + masses
 
 implicit none
@@ -91,7 +91,7 @@ contains
 !------------------------------
 
 subroutine walk(X, V, itime, ftime)
-  use data_parameters
+  use parameters
   implicit none
   real(8),dimension(3*N_BOD) :: X,V
   real(8) :: itime, ftime

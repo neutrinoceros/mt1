@@ -3,7 +3,7 @@ module sub_nbodies
 contains 
 
 subroutine Forces(X, V, time, F)
-  use data_parameters
+  use parameters
   use data_planets
   implicit none
   real(8) :: time
@@ -34,7 +34,7 @@ end subroutine Forces
 
 subroutine Energy(P, V, time, En)
   !computes the total energy (kinetic + potential) of the system
-  use data_parameters
+  use parameters
   use data_planets
   implicit none
   real(8) :: time
@@ -75,7 +75,7 @@ end subroutine Energy
 subroutine AMomentum(P, V, time, L)
   ! computes the total angular momentum with respect to the frame's origin 
   use maths
-  use data_parameters
+  use parameters
   use data_planets
   implicit none
   real(8) :: time

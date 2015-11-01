@@ -1,4 +1,4 @@
-module data_parameters
+module parameters
 
 !----------------------------------------------------------------------
 ! N_BOD is the desired number of bodies to be used in the program
@@ -43,4 +43,4 @@ real(8),parameter :: SSTEP      = 2D0
 real(8),parameter :: TMAX       = 50*88
 integer,parameter :: SAMPLERATE = 1 
 
-end module data_parameters
+end module parameters

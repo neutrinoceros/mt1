@@ -59,7 +59,7 @@ with open('data/icplanets.dat','w') as flux :
 #-----------------------------------
 
 dm = 'module data_planets \n\n'
-dm += 'use data_parameters\n'
+dm += 'use parameters\n'
 
 lennames=10
 dm += '\tcharacter(len='+str(lennames)+'),parameter,dimension(N_BOD) :: NAMES=(/ &\n'

@@ -1,6 +1,6 @@
 module data_planets 
 
-use data_parameters
+use parameters
 	character(len=10),parameter,dimension(N_BOD) :: NAMES=(/ &
 		"Sun       ",&
 		"Mercury   ",&
