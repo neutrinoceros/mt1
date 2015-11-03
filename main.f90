@@ -33,10 +33,12 @@ open(10,file='results/ipms.dat',status='replace')!intégrales premières
 write(10,*) "#     time                         Etot                           Ltot"
 
 open(20,file='results/traj.dat',status='replace')!positions
+open(30,file='results/traj_back.dat',status='replace')!positions, au retour
 open(16,file='results/out_everhart.dat',status='replace')
 
 write(10,OFMT1) ftime, Etot, Ltot
-write(20,OFMT2) Positions
+!write(20,*)     '#initial state :'
+!write(20,OFMT2) '#',Positions
 
 print*, 'bodies used are : ', NAMES
 
@@ -69,7 +71,7 @@ ftime = itime - SSTEP
 do while (ftime > 0)
    i = i+1
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
-      write(20,OFMT2) Positions
+      write(30,OFMT2) Positions
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
@@ -80,6 +82,8 @@ do while (ftime > 0)
 end do
 
 close(10)
+close(20)
+close(30)
 close(16)
 
 print*, "Program end."

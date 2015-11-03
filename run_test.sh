@@ -3,6 +3,6 @@
 ./compil.sh
 ./program
 
-#wc results/traj.dat 
-ipython pyplot/traj.py
-ipython pyplot/ipms.py
+#ipython pyplot/traj.py
+#ipython pyplot/ipms.py
+ipython pyplot/mercurydtest.py
