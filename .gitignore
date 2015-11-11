@@ -1,6 +1,12 @@
 #specific files
-*.16 #don't know what it is but we don't need it
-*program #compile it yourself, that's for your own good :3
+
+program
+img/*
+results/*
+*~
+*pyc
+*#
+
 
 # Compiled Object files
 *.slo
