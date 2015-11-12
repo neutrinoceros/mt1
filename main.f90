@@ -15,7 +15,6 @@ character(len=30) :: OFMT1,OFMT2
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
 
-
 !------------------------------
 !     init, file opening...
 !------------------------------
@@ -85,6 +84,24 @@ close(10)
 close(20)
 close(30)
 close(16)
+
+
+!-------------------------------
+!     load ans use SPICE
+!-------------------------------
+
+! print*, "Spice usage ... (wip)"
+! call furnsh('../toolkit/di')
+! do i=1..
+!    call SPKEZR(ET,'mercury','J2000','SOLAR SYSTEM BARYCENTER','NONE',STATE,1)
+!    ! ET    : date : [(date+date_ini_JJ)-2451545.do]*86400.do
+!    ! target: name body 'venus','mercury'
+!    ! FRAME : 'J2000'
+!    ! OSB   : 'SOLAR SYSTEM BARYCENTER'
+!    ! ABCORR: 'NONE'
+!    ! STATE : 'km day km/jday' (vecteur qui concerne uniquement l'objet qui nous intéresse)
+!    ! LT    : Light time       (useless to us)
+! end do
 
 print*, "Program end."
 
