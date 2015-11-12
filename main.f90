@@ -10,7 +10,12 @@ real(8),dimension(:),allocatable :: Positions, Velocities
 integer :: i!,j
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
-character(len=30) :: OFMT1,OFMT2
+character(len=30) :: OFMT1,OFMT2,OFMT3 !line format for diverse out files
+
+!spice useful variables
+real(8) :: ET,LT,date_d !ET is ..., LT is light-time, date_d is time passed since init_date_jd in days 
+real(8),dimension(6) :: body_state
+
 
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
@@ -27,6 +32,7 @@ itime = 0.
 ftime = SSTEP
 OFMT1 = "(3E30.16E3)"
 OFMT2 = "(33E18.8E3)"
+OFMT3 = "(7E30.16E3)"
 
 open(10,file='results/ipms.dat',status='replace')!intégrales premières
 write(10,*) "#     time                         Etot                           Ltot"
@@ -90,18 +96,27 @@ close(16)
 !     load ans use SPICE
 !-------------------------------
 
-! print*, "Spice usage ... (wip)"
-! call furnsh('../toolkit/di')
-! do i=1..
-!    call SPKEZR(ET,'mercury','J2000','SOLAR SYSTEM BARYCENTER','NONE',STATE,1)
-!    ! ET    : date : [(date+date_ini_JJ)-2451545.do]*86400.do
-!    ! target: name body 'venus','mercury'
-!    ! FRAME : 'J2000'
-!    ! OSB   : 'SOLAR SYSTEM BARYCENTER'
-!    ! ABCORR: 'NONE'
-!    ! STATE : 'km day km/jday' (vecteur qui concerne uniquement l'objet qui nous intéresse)
-!    ! LT    : Light time       (useless to us)
-! end do
+print*, "Spice usage ... (wip)"
+open(100,file='results/out_spice.dat',status='replace')
+write(100,*) "# date (from origin, in days), Mercury state (position x,y,z then velocity x,y,z)"
+write(100,*) "# positions in km, velocities in km/day"
+
+call FURNSH('../toolkit/data/de430.bsp')
+
+date_d = 0d0
+do while (date_d < TMAX)
+   call get_ET(date_d,ET)
+   call SPKEZR('mercury',ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
+   ! target : name body 'venus','mercury'
+   ! ET     : date : [(date+date_ini_JJ)-2451545.do]*86400.do
+   ! REF    : 'J2000'
+   ! ABCORR : 'NONE'
+   ! OSB    : 'SOLAR SYSTEM BARYCENTER'
+   ! STATE  : 'km km/jday' (position/velocity)
+   ! LT     : Light time   (useless to us)
+   write(100,OFMT3) date_d, body_state
+   date_d = date_d + SAMPLERATE
+end do
 
 print*, "Program end."
 
@@ -128,5 +143,15 @@ subroutine walk(X, V, itime, ftime)
   nsor   =  1        ! refresh sortie (angular momentum) every nsor step
  call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,Energy)
 end subroutine walk
+
+
+subroutine get_ET(date_d,ET)
+  ! converts date from (days past since initial date) to (seconds past since j2000)
+  use parameters
+  implicit none
+  real(8) :: date_d, ET
+  ET = ((init_date_jd + date_d) - j2000_jd) * 86400d0
+end subroutine get_ET
+
 
 end program ephemerids

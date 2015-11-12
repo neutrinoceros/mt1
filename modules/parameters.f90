@@ -1,5 +1,7 @@
 module parameters
 
+real(8),parameter :: init_date_jd = 2440400.5 ! june 28 1969 in Julian days
+real(8),parameter :: j2000_jd     = 2451545.0 ! january 1st 2000 in Julian days
 !----------------------------------------------------------------------
 ! N_BOD is the desired number of bodies to be used in the program
 ! They are loaded in the following order :
