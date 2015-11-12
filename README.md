@@ -35,32 +35,16 @@ available on [Dropbox](https://www.dropbox.com/sh/48ggibduzgidf6v/AAB1_qRgjvUp0z
     $ git commit -m "[short descritpion of the changes]"
     $ git push origin master
 
-##SPICE library
+##install SPICE 
 
-* Site    : [naif.jpl.nasa.gov](http://naif.jpl.nasa.gov/naif/data_generic.html)
-* Toolkit : lib spice
-* Data    : de430 ephemeris
-* path    : 
-     -  MT1-ressources  /toolkit/lib/spicelib.a     : 
-     -  /data/de430 données de430, DL at [naif.jpl.nasa.gov](http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/)
+ 1. download the [toolkit](http://naif.jpl.nasa.gov/naif/toolkit_FORTRAN.html)
+ 2. move it to the directory that contains mt1/
+ 3. download the [data file](http://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de430.bsp) and move it to toolkit/data
 
-NAIF integer code ID : [naif.jpl.nasa.gov](http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/naif_ids.html)
+**NAIF integer code ID :**
 
-**instructions**
+[naif.jpl.nasa.gov](http://naif.jpl.nasa.gov/pub/naif/toolkit_docs/FORTRAN/req/naif_ids.html)
 
-  ```fortran
-    call FURNSH('PATH/di') gfortran xxx.f90 $PATH/lib/spicelib.a
-    Do i=1..
-        call SPKEZR(ET,target,FRAME,OBS,ABCORR,STATE,LT)
-        ! ET    : date : [(date+date_ini_JJ)-2451545.do]*86400.do
-        ! target: name body 'venus','mercury'
-        ! FRAME : 'J2000'
-        ! OSB   : 'SOLAR SYSTEM BARYCENTER'
-        ! ABCORR: 'NONE'
-        ! STATE : 'km day km/jday' (vecteur qui concerne uniquement l'objet qui nous intéresse)
-        ! LT    : Light time       (useless to us)
-  ```
-  
 ##To do
 
 **debbuging**
