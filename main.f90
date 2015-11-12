@@ -31,7 +31,7 @@ call AMomentum(Positions, Velocities, ftime, Ltot)
 itime = 0.
 ftime = SSTEP
 OFMT1 = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
-OFMT2 = "(34E30.16E3)"   ! fmt of traj.dat and traj_back.dat
+OFMT2 = "(34E30.16E3)"  ! fmt of traj.dat and traj_back.dat
 OFMT3 = "(7E30.16E3)"   ! fmt of traj_spice.dat
 
 open(10,file='results/ipms.dat',status='replace')         ! intégrales premières
