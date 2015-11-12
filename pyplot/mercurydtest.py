@@ -46,15 +46,20 @@ for i in range(niter) :
     dm0[i] = distance(p1,p2)
 
 
+dm0  *= au2km*1000      #conversion 'a.u. --> m '
+time /= 365             #conversion 'day  --> yr'
+
+
 #    plotting
 #=================
-fig,ax=pl.subplots()
-ax.semilogy(time,dm1,lw=LW,alpha=ALPHA,label='forward integration')
-ax.semilogy(time,dm2,lw=LW,alpha=ALPHA,label='backward integration')
-ax.semilogy(time,dm0,lw=LW,alpha=ALPHA,label='forward - backward')
+fig, (ax0, ax1) = pl.subplots(nrows=2, sharex=True)
 
-ax.set_xlabel('time [day]',size=SIZE)
-ax.set_ylabel(r'$|\overrightarrow{r}_{prog}-\overrightarrow{r}_{SPICE}|$ [a.u.]',size=SIZE)
-pl.legend(frameon=False,loc=4)
+ax0.semilogy(time,dm1,lw=1,alpha=ALPHA,ls='-' ,c='r')
+ax1.semilogy(time,dm0,lw=1,alpha=ALPHA,ls='-' ,c='b')
+
+ax0.set_xlim(min(time),max(time))
+ax0.set_ylabel(r'$|\overrightarrow{r}_{for}-\overrightarrow{r}_{SPICE}|$ [a.u.]',size=SIZE)
+ax1.set_ylabel(r'$|\overrightarrow{r}_{for}-\overrightarrow{r}_{back}|$ [m]'    ,size=SIZE)
+ax1.set_xlabel(r'$t$ [yr]',size=SIZE)
 
 pl.show()

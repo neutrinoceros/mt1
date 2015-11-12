@@ -42,7 +42,7 @@ real(8),parameter :: GCST  = 0.2959122082855911e-3
 
 real(8),parameter :: ISTEP      = 2D0  
 real(8),parameter :: SSTEP      = 2D0 
-real(8),parameter :: TMAX       = 50*88
+real(8),parameter :: TMAX       = 36500
 integer,parameter :: SAMPLERATE = 1 
 
 end module parameters
