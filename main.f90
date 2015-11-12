@@ -16,15 +16,15 @@ character(len=30) :: OFMT1,OFMT2,OFMT3 !line format for diverse out files
 real(8) :: ET,LT,date_d !ET is ..., LT is light-time, date_d is time passed since init_date_jd in days 
 real(8),dimension(6) :: body_state
 
-
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
 
-!------------------------------
-!     init, file opening...
-!------------------------------
+!================================================================
+!                       init, file opening...
+!================================================================
+
 print*, "Initializing..."
-Positions = IPOSITIONS
+Positions  = IPOSITIONS
 Velocities = IVELOCITIES
 call Energy(Positions, Velocities, ftime, Etot)
 call AMomentum(Positions, Velocities, ftime, Ltot)
@@ -47,9 +47,10 @@ write(10,OFMT1) ftime, Etot, Ltot
 
 print*, 'bodies used are : ', NAMES
 
-!------------------------------
-!          main loop
-!------------------------------
+
+!================================================================
+!                          main loop
+!================================================================
 
 print*, "Entering main loop."
 i=0
@@ -67,7 +68,7 @@ do while (itime < TMAX)
 end do
 print *, "TMAX reached."
 
-!------------------------------
+!----------------------------------------------------------------
 
 print*, "Back to starting point."
 i=0
@@ -92,9 +93,9 @@ close(30)
 close(16)
 
 
-!-------------------------------
-!     load ans use SPICE
-!-------------------------------
+!================================================================
+!                       load and use SPICE
+!================================================================
 
 print*, "Spice usage ... (wip)"
 open(100,file='results/out_spice.dat',status='replace')
@@ -122,9 +123,10 @@ print*, "Program end."
 
 contains
 
-!------------------------------
-!      local subroutines
-!------------------------------
+
+!================================================================
+!                       local subroutines
+!================================================================
 
 subroutine walk(X, V, itime, ftime)
   use parameters
