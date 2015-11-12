@@ -30,17 +30,17 @@ call Energy(Positions, Velocities, ftime, Etot)
 call AMomentum(Positions, Velocities, ftime, Ltot)
 itime = 0.
 ftime = SSTEP
-OFMT1 = "(3E30.16E3)"
-OFMT2 = "(33E18.8E3)"
-OFMT3 = "(7E30.16E3)"
+OFMT1 = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
+OFMT2 = "(34E30.16E3)"   ! fmt of traj.dat and traj_back.dat
+OFMT3 = "(7E30.16E3)"   ! fmt of traj_spice.dat
 
-open(10,file='results/ipms.dat',status='replace')!intégrales premières
-write(10,*) "#     time                         Etot                           Ltot"
-
-open(20,file='results/traj.dat',status='replace')!positions
-open(30,file='results/traj_back.dat',status='replace')!positions, au retour
+open(10,file='results/ipms.dat',status='replace')         ! intégrales premières
+open(11,file='results/ipms_back.dat',status='replace')    ! intégrales premières, au retour
+open(20,file='results/traj.dat',status='replace')         ! positions
+open(21,file='results/traj_back.dat',status='replace')    ! positions, au retour
 open(16,file='results/out_everhart.dat',status='replace')
 
+write(10,*) "#     time                         Etot                           Ltot"
 write(10,OFMT1) ftime, Etot, Ltot
 !write(20,*)     '#initial state :'
 !write(20,OFMT2) '#',Positions
@@ -57,7 +57,7 @@ i=0
 do while (itime < TMAX)
    i = i+1
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
-      write(20,OFMT2) Positions
+      write(20,OFMT2) itime, Positions
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
@@ -74,18 +74,19 @@ print*, "Back to starting point."
 i=0
 itime = ftime
 ftime = itime - SSTEP
-do while (ftime > 0)
+do while (ftime .ge. 0)
    i = i+1
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
-      write(30,OFMT2) Positions
+      write(21,OFMT2) itime, Positions
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(10,OFMT1) ftime, Etot, Ltot
+   write(11,OFMT1) ftime, Etot, Ltot
    itime = itime - SSTEP
    ftime = ftime - SSTEP
 end do
+write(21,OFMT2) itime, Positions
 
 close(10)
 close(20)
@@ -97,8 +98,8 @@ close(16)
 !                       load and use SPICE
 !================================================================
 
-print*, "Spice usage ... (wip)"
-open(100,file='results/out_spice.dat',status='replace')
+print*, "Calling SPICE for comparative results..."
+open(100,file='results/traj_spice.dat',status='replace')
 write(100,*) "# date (from origin, in days), Mercury state (position x,y,z then velocity x,y,z)"
 write(100,*) "# positions in km, velocities in km/day"
 
@@ -116,7 +117,7 @@ do while (date_d < TMAX)
    ! STATE  : 'km km/jday' (position/velocity)
    ! LT     : Light time   (useless to us)
    write(100,OFMT3) date_d, body_state
-   date_d = date_d + SAMPLERATE
+   date_d = date_d + SSTEP
 end do
 
 print*, "Program end."

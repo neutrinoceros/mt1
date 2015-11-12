@@ -2,9 +2,10 @@
 
 from pybox import *
 
-#------------------------------
-#        data loading
-#------------------------------
+
+#===================================
+#           data loading
+#===================================
 
 tab   = np.loadtxt("./results/traj.dat", dtype = np.float64)
 n_bod = tab.shape[1]/3
@@ -15,9 +16,9 @@ if raw_2D in 'yY' :
 else :
     threed = True
 
-#------------------------------
-#          plotting
-#------------------------------
+#===================================
+#             plotting
+#===================================
 
 pl.ion()
 if threed :
@@ -37,8 +38,7 @@ for n,c,name in zip(range(n_bod),COLORS,NAMES) :
         ls = '--'
         lw = 1
 
-    x,y,z = tab[:,3*n],tab[:,3*n+1],tab[:,3*n+2]
-    x,y,z = tab[:,3*n]-tab[:,0] , tab[:,3*n+1]-tab[:,1] , tab[:,3*n+2] - tab[:,1]
+    x,y,z = tab[:,3*n+1],tab[:,3*n+2],tab[:,3*n+3]
     if threed :
         ax.plot(x,y,z,lw=lw,alpha=ALPHA,ls=ls,color=c,label=name)
         ax.scatter(x[-1],y[-1],z[-1],color=c,edgecolor='k')
@@ -58,9 +58,9 @@ if threed :
 ax.legend(loc=2)
 pl.legend(frameon=False)
 
-#------------------------------
-#      saving (optional)
-#------------------------------
+#===================================
+#         saving (optional)
+#===================================
 
 saveB=raw_input('save img ? (y/(n)) :    ')
 if saveB in 'yY' and saveB != '' :
