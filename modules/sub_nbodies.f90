@@ -108,31 +108,23 @@ subroutine AMomentum(P, V, time, L)
 end subroutine AMomentum
 
 
-! subroutine updateCenter(Masses, Positions, N_BOD, center)
-!   !updates the position of the system's mass center
-!   implicit none
-!   integer :: N_BOD
-!   real(8),dimension(N_BOD)   :: Masses
-!   real(8),dimension(3*N_BOD) :: Positions
-!   real(8),dimension(3) :: center
-!   !local
-!   real(8) :: masstot=0
-!   integer :: i,j,ii
+subroutine walk(X, V, itime, ftime)
+  use parameters
+  implicit none
+  real(8),dimension(3*N_BOD) :: X,V
+  real(8) :: itime, ftime
+  !local
+  integer :: ll,nv,nclass,nor,nsor
+  real(8) :: xl = ISTEP
 
-!   center(:) = 0
+  ll     = -1        ! if < 0   : constant step
+                     ! elif > 0 : tolerance à la troncature numérique (1e-12 chez Valéry) 
+  nv     = 3*N_BOD   ! number of simultaneous diff eq
+  nclass = -2        ! ode form is "y''=F(y,t)"
+  nor    =  1        ! useless here (commented)
+  nsor   =  1        ! refresh sortie (angular momentum) every nsor step
+  call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,Energy)
+end subroutine walk
 
-!   do i=1,N_BOD
-!      ii = 3*(i-1)+1
-!      masstot = masstot + Masses(i) !Il faudrait que la somme se fasse des plus petits corps aux plus grands
-!                                    !le plus simple serait donc de les ordonner dès le départ à la lecture du fichier
-!      do j=1,3
-!         center(j) = center(j) + Masses(i) * Positions(ii+j-1)
-!      end do
-!   end do
-
-!   do j=1,N_BOD
-!      center(j) = center(j)/masstot
-!   end do
-! end subroutine updateCenter
 
 end module sub_nbodies
