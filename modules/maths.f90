@@ -25,11 +25,4 @@ function norm2(a)
   norm2 = sum(a**2)
 end function norm2
 
-!function normalize(a)
-!  implicit none
-!  real(8),dimension(3),intent(in)::a
-!  real(8),dimension(3),intent(out)::normalize
-!  normalize(:) = a(:)/mod(a)
-!end function normalize
-
 end module maths
