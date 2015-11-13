@@ -11,4 +11,25 @@ function cross(a,b)
   cross(3) = a(1)*b(2) - a(2)*b(1)
 end function cross
 
+function norm(a)
+  implicit none
+  real(8),dimension(3),intent(in)::a
+  real(8)::norm
+  norm = sqrt(sum(a**2))
+end function norm
+
+function norm2(a)
+  implicit none
+  real(8),dimension(3),intent(in)::a
+  real(8)::norm2
+  norm2 = sum(a**2)
+end function norm2
+
+!function normalize(a)
+!  implicit none
+!  real(8),dimension(3),intent(in)::a
+!  real(8),dimension(3),intent(out)::normalize
+!  normalize(:) = a(:)/mod(a)
+!end function normalize
+
 end module maths
