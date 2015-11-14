@@ -2,10 +2,6 @@ module secular
 use maths
 use parameters
 
-!==============================
-!      local functions
-!==============================
-
 contains
 
 function kepler(x,v,m) 
@@ -18,12 +14,14 @@ function kepler(x,v,m)
 
   real(8),dimension(6),intent(in) :: x,v
   real(8),dimension(2),intent(in) :: m
-  real(8),dimension(5):: kepler
+  real(8),dimension(6):: kepler
 
   ! LOCAL VAR :
 
   real(8),dimension(3):: q,s,u,L,k,e,v_c
-  real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current
+  real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,MeanMotion
+
+  MeanMotion = -1 !TO DO : IMPLEMENT PROPER COMPUTATION
 
   !instructions
   mu = GCST*sum(m)
@@ -67,16 +65,8 @@ function kepler(x,v,m)
     w = -w
   Endif 
 
-  kepler = [a,exc,i,Omega,w]
+  kepler = [a,exc,i,Omega,w,MeanMotion]
 
 end function kepler
 
 end module secular
-
-! =====================================
-!     TODO :
-!        * computing mean motion M(t)
-!
-!
-!
-! =====================================
