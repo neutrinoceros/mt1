@@ -4,7 +4,7 @@ use maths
 use sub_nbodies
 use parameters
 use data_planets ! initial conditions + MASSES
-
+use secular
 
 !================================================================
 !                    variables declaration
@@ -17,11 +17,11 @@ integer :: i
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 
-real(8),dimension(:),allocatable :: twobod_imps
+real(8),dimension(:),allocatable :: twobod_ipms
 
 ! line formats for out files
 !----------------------------
-character(len=30) :: OFMT1,OFMT2,OFMT3 
+character(len=30) :: OFMT1,OFMT2,OFMT3,OFMT4
 
 !  SPICE useful variables
 !----------------------------
@@ -53,7 +53,7 @@ OFMT1 = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
 OFMT2 = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat, 
                         !        vel.dat, vel_back.dat
 OFMT3 = "(7E30.16E3)"   ! fmt of traj_spice.dat
-OFMT4 = "(6E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
+OFMT4 = "(7E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
 
 open(10,file='results/ipms.dat'        ,status='replace')  ! intégrales premières
 open(11,file='results/ipms_back.dat'   ,status='replace')  ! intégrales premières, au retour
@@ -91,16 +91,17 @@ do while (itime < TMAX)
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
       write(20,OFMT2) itime, Positions
       write(30,OFMT2) itime, Velocities
+      if (N_BOD .eq. 2) then
+         twobod_ipms = kepler(Positions,Velocities,MASSES)
+         print *, twobod_ipms
+         
+         write(100,OFMT4) itime, twobod_ipms
+      end if
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(10,OFMT1) ftime, Etot, Ltot
-   if (N_BOD .eq. 2) then
-      twobod_imps = kepler(Positions,Velocities,MASSES)
-      write(100,OFTM4) twobod_ipms
-   end if
-   
+   write(10,OFMT1) ftime, Etot, Ltot   
    itime = itime + SSTEP
    ftime = ftime + SSTEP
 end do
@@ -122,16 +123,15 @@ do while (ftime .ge. 0)
    if (mod(i,int(SAMPLERATE)) .eq. 0) then
       write(21,OFMT2) itime, Positions
       write(31,OFMT2) itime, Velocities
+      if (N_BOD .eq. 2) then
+         twobod_ipms = kepler(Positions,Velocities,MASSES)
+         write(101,OFMT4) itime, twobod_ipms
+      end if
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(11,OFMT1) ftime, Etot, Ltot
-   if (N_BOD .eq. 2) then
-      twobod_imps = kepler(Positions,Velocities,MASSES)
-      write(101,OFTM4) twobod_ipms
-   end if
-   
    itime = itime - SSTEP
    ftime = ftime - SSTEP
 end do

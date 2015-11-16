@@ -21,7 +21,7 @@ function kepler(x,v,m)
   real(8),dimension(3):: q,s,u,L,k,e,v_c
   real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,MeanMotion
 
-  MeanMotion = -1 !TO DO : IMPLEMENT PROPER COMPUTATION
+  MeanMotion = -1 ! TO DO : IMPLEMENT PROPER COMPUTATION
 
   !instructions
   mu = GCST*sum(m)
@@ -34,7 +34,7 @@ function kepler(x,v,m)
   !moment of inertia
   L = cross(q,s)
   mL = norm(L)
-  k(1:3) = L(1:3)/mu
+  k(1:3) = L(1:3)/mL
 
   ! energy
   h = 0.5*norm2(s) - mu/r
