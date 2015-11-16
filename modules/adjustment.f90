@@ -2,7 +2,6 @@ module adjustment
 
 contains
 
-
 subroutine computeTabDr(Xi,Vi,n,tab_DR)
   use parameters
   use sub_nbodies
@@ -56,7 +55,7 @@ subroutine computeTabDr(Xi,Vi,n,tab_DR)
 
   do while (itime < TMAX)
      i = i+1
-     if (mod(itime,int(DELTAT_SAMPLE)) .eq. 0) then 
+     if (mod(int(itime),int(DELTAT_SAMPLE)) .eq. 0) then 
         j  = j+1
         ! R1(1:3*N_BOD)         = X1 
         ! R1(3*N_BOD+1:6*N_BOD) = V1 
