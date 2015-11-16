@@ -12,7 +12,7 @@ OUT="maths.o parameters.o data_planets.o sub_nbodies.o secular.o adjustment.o RA
 #locate the spice library file
 SPICEPATH="../toolkit/lib/spicelib.a"
 
-WFLAGS="-Wall -Wextra  -fbounds-check"
+WFLAGS="-Wall -Wextra -fbounds-check"
 
 $PYTERM $PARSER
 $COMPILER -c $SRC77

@@ -19,6 +19,8 @@ real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 
 real(8),dimension(:),allocatable :: twobod_ipms
+real(8),dimension(:,:,:),allocatable :: partials
+
 
 ! line formats for out files
 !----------------------------
@@ -37,6 +39,7 @@ real(8),dimension(6) :: body_state
 !----------------------------
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
+allocate(partials(6*N_BOD,N_EVAL,3*N_BOD))
 if (N_BOD .eq. 2) allocate(twobod_ipms(6))
 
 !================================================================
@@ -94,8 +97,6 @@ do while (itime < TMAX)
       write(30,OFMT2) itime, Velocities
       if (N_BOD .eq. 2) then
          twobod_ipms = kepler(Positions,Velocities,MASSES)
-         print *, twobod_ipms
-         
          write(100,OFMT4) itime, twobod_ipms
       end if
    end if
@@ -174,14 +175,23 @@ do while (date_d < TMAX)
    date_d = date_d + SSTEP
 end do
 
+
+
+!================================================================
+!                FINDING ALL DERIVATIVES
+!================================================================
+
+print*, 'computation of partial derivatives (long)'
+
+call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
+
 print*, "Program end."
-
-contains
-
 
 !================================================================
 !                       local subroutines
 !================================================================
+
+contains
 
 subroutine get_ET(date_d,ET)
   ! converts date from (days past since initial date) to (seconds past since j2000)
