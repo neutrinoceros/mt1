@@ -19,9 +19,9 @@ function kepler(x,v,m)
   ! LOCAL VAR :
 
   real(8),dimension(3):: q,s,u,L,k,e,v_c
-  real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,MeanMotion
+  real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,n
 
-  MeanMotion = -1 ! TO DO : IMPLEMENT PROPER COMPUTATION
+  !n = -1 ! TO DO : IMPLEMENT PROPER COMPUTATION
 
   !instructions
   mu = GCST*sum(m)
@@ -65,7 +65,10 @@ function kepler(x,v,m)
     w = -w
   Endif 
 
-  kepler = [a,exc,i,Omega,w,MeanMotion]
+  ! n = Mean Motion
+  n = sqrt(mu/a)
+
+  kepler = [a,exc,i,Omega,w,n]
 
 end function kepler
 
