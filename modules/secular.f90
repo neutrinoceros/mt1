@@ -21,8 +21,6 @@ function kepler(x,v,m)
   real(8),dimension(3):: q,s,u,L,k,e,v_c
   real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,n
 
-  !n = -1 ! TO DO : IMPLEMENT PROPER COMPUTATION
-
   !instructions
   mu = GCST*sum(m)
   q = x(4:6)-x(1:3) !relative positions
