@@ -2,6 +2,7 @@ module parameters
 
 real(8),parameter :: init_date_jd = 2440400.5 ! june 28 1969 in Julian days
 real(8),parameter :: j2000_jd     = 2451545.0 ! january 1st 2000 in Julian days
+
 !----------------------------------------------------------------------
 ! N_BOD is the desired number of bodies to be used in the program
 ! They are loaded in the following order :
@@ -11,10 +12,10 @@ real(8),parameter :: j2000_jd     = 2451545.0 ! january 1st 2000 in Julian days
 ! Saturn    Uranus    Neptune   Pluto     Moon
 !----------------------------------------------------------------------
 
-integer,parameter :: N_BOD = 11
+integer,parameter :: N_BOD = 2
 real(8),parameter :: GCST  = 0.2959122082855911e-3
 
-!real(8),parameter :: GCST  = 1.50528915669e-17 
+! real(8),parameter :: GCST  = 1.50528915669e-17 
 ! gravitational constant, here in SAD units (Solar mass, Astronomical unit, Day)
 ! conversion from SI is done in convtool.py script
 
@@ -40,9 +41,28 @@ real(8),parameter :: GCST  = 0.2959122082855911e-3
 !  * 6mounths = 182 days
 !----------------------------------------------------------------------
 
-real(8),parameter :: ISTEP      = 2D0  
-real(8),parameter :: SSTEP      = 2D0 
+real(8),parameter :: ISTEP      = 2d0  
+real(8),parameter :: SSTEP      = 2d0 
 real(8),parameter :: TMAX       = 36500
 integer,parameter :: SAMPLERATE = 1 
+
+
+!======================================================================
+! ADJUSTMENT PARAMETERS
+! ---------------------
+!
+!  * EPSILON is the "small divergence" from initial condition used in
+!        evaluation of a partial derivative \partial_{C_i} r^c
+!        where C_i are x,y,z initial positions for every body used,
+!        so EPSILON is a distance, typically far shorter than 1 a.u.
+!  * DELTAT_SAMPLE is the time interval between two evaluations,
+!        it should be taken as a multiple of SSTEP 
+!  * N_EVAL is the number of instants at which we evaluate the multiple
+!        derivatives. Should be typically 10 or 100...
+!======================================================================
+
+real(8),parameter :: EPSILON        = 1e-7        ! approx 10m (in a.u.)
+real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 1e3
+integer,parameter :: N_EVAL         = floor(TMAX / DELTAT_SAMPLE)
 
 end module parameters

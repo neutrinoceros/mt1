@@ -4,7 +4,8 @@ use maths
 use sub_nbodies
 use parameters
 use data_planets ! initial conditions + MASSES
-
+use secular
+use adjustment
 
 !================================================================
 !                    variables declaration
@@ -17,11 +18,13 @@ integer :: i
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 
-real(8),dimension(:),allocatable :: twobod_imps
+real(8),dimension(:),allocatable :: twobod_ipms
+real(8),dimension(:,:,:),allocatable :: partials
+
 
 ! line formats for out files
 !----------------------------
-character(len=30) :: OFMT1,OFMT2,OFMT3 
+character(len=30) :: OFMT1,OFMT2,OFMT3,OFMT4
 
 !  SPICE useful variables
 !----------------------------
@@ -36,6 +39,7 @@ real(8),dimension(6) :: body_state
 !----------------------------
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
+allocate(partials(6*N_BOD,N_EVAL,3*N_BOD))
 if (N_BOD .eq. 2) allocate(twobod_ipms(6))
 
 !================================================================
@@ -53,7 +57,7 @@ OFMT1 = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
 OFMT2 = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat, 
                         !        vel.dat, vel_back.dat
 OFMT3 = "(7E30.16E3)"   ! fmt of traj_spice.dat
-OFMT4 = "(6E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
+OFMT4 = "(7E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
 
 open(10,file='results/ipms.dat'        ,status='replace')  ! intégrales premières
 open(11,file='results/ipms_back.dat'   ,status='replace')  ! intégrales premières, au retour
@@ -91,16 +95,15 @@ do while (itime < TMAX)
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
       write(20,OFMT2) itime, Positions
       write(30,OFMT2) itime, Velocities
+      if (N_BOD .eq. 2) then
+         twobod_ipms = kepler(Positions,Velocities,MASSES)
+         write(100,OFMT4) itime, twobod_ipms
+      end if
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(10,OFMT1) ftime, Etot, Ltot
-   if (N_BOD .eq. 2) then
-      twobod_imps = kepler(Positions,Velocities,MASSES)
-      write(100,OFTM4) twobod_ipms
-   end if
-   
+   write(10,OFMT1) ftime, Etot, Ltot   
    itime = itime + SSTEP
    ftime = ftime + SSTEP
 end do
@@ -119,19 +122,18 @@ itime = ftime
 ftime = itime - SSTEP
 do while (ftime .ge. 0)
    i = i+1
-   if (mod(i,int(SAMPLERATE)) .eq. 0) then 
+   if (mod(i,int(SAMPLERATE)) .eq. 0) then
       write(21,OFMT2) itime, Positions
       write(31,OFMT2) itime, Velocities
+      if (N_BOD .eq. 2) then
+         twobod_ipms = kepler(Positions,Velocities,MASSES)
+         write(101,OFMT4) itime, twobod_ipms
+      end if
    end if
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(11,OFMT1) ftime, Etot, Ltot
-   if (N_BOD .eq. 2) then
-      twobod_imps = kepler(Positions,Velocities,MASSES)
-      write(101,OFTM4) twobod_ipms
-   end if
-   
    itime = itime - SSTEP
    ftime = ftime - SSTEP
 end do
@@ -173,33 +175,23 @@ do while (date_d < TMAX)
    date_d = date_d + SSTEP
 end do
 
+
+
+!================================================================
+!                FINDING ALL DERIVATIVES
+!================================================================
+
+print*, 'computation of partial derivatives (long)'
+
+call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
+
 print*, "Program end."
-
-contains
-
 
 !================================================================
 !                       local subroutines
 !================================================================
 
-subroutine walk(X, V, itime, ftime)
-  use parameters
-  implicit none
-  real(8),dimension(3*N_BOD) :: X,V
-  real(8) :: itime, ftime
-  !local
-  integer :: ll,nv,nclass,nor,nsor
-  real(8) :: xl = ISTEP
-
-  ll     = -1        ! if < 0   : constant step 
-                     ! elif > 0 : tolerance à la troncature numérique (1e-12 chez Valéry) 
-  nv     = 3*N_BOD   ! number of simultaneous diff eq
-  nclass = -2        ! ode form is "y''=F(y,t)"
-  nor    =  1        ! useless here (commented)
-  nsor   =  1        ! refresh sortie (angular momentum) every nsor step
- call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,Energy)
-end subroutine walk
-
+contains
 
 subroutine get_ET(date_d,ET)
   ! converts date from (days past since initial date) to (seconds past since j2000)
