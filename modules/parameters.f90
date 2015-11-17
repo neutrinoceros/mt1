@@ -62,7 +62,7 @@ integer,parameter :: SAMPLERATE = 1
 !======================================================================
 
 real(8),parameter :: EPSILON        = 1e-7        ! approx 10m (in a.u.)
-real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 100
+real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 1e3
 integer,parameter :: N_EVAL         = floor(TMAX / DELTAT_SAMPLE)
 
 end module parameters

@@ -8,4 +8,4 @@
 #ipython pyplot/mercurydtest.py
 #ipython pyplot/2bodiestests.py
 
-head results/alld.dat
+#head results/alld.dat
