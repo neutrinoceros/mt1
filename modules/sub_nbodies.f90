@@ -122,7 +122,7 @@ subroutine walk(X, V, itime, ftime)
   nv     = 3*N_BOD   ! number of simultaneous diff eq
   nclass = -2        ! ode form is "y''=F(y,t)"
   nor    =  1        ! useless here (commented)
-  nsor   =  1        ! refresh sortie (angular momentum) every nsor step
+  nsor   =  1        ! refresh sortie every nsor step
   call RA15M(X,V,itime,ftime,xl,ll,nv,nclass,nor,nsor,Forces,Energy)
 end subroutine walk
 

@@ -36,7 +36,7 @@ subroutine computeTabDr(Xi,Vi,n,tab_DR)
      X1(n) = Xi(n) + EPSILON
      X2(n) = Xi(n) - EPSILON
   else if (n .gt. 3*N_BOD .and. n .le. 6*N_BOD) then
-     p=n-3*N_BOD
+     p = n-3*N_BOD
      V1(p) = Vi(p) + EPSILON
      V2(p) = Vi(p) - EPSILON
   else 
@@ -54,8 +54,8 @@ subroutine computeTabDr(Xi,Vi,n,tab_DR)
      do while(itime < j*DELTAT_SAMPLE)
         call walk(X1, V1, itime, ftime)
         call walk(X2, V2, itime, ftime)
-        itime = itime + SSTEP
-        ftime = ftime + SSTEP
+        itime = itime + ISTEP
+        ftime = ftime + ISTEP
      end do
      tab_DR(j,:) = (X1-X2)/(2*EPSILON)
   end do
@@ -92,10 +92,11 @@ subroutine computeAllPartials(Xi,Vi,partials)
   print*,'writing'
   !WIP || when ready for launch, export this part of the code to main.f90
   open(44,file='results/alld.dat',status='replace')
-  do i=0,N_EVAL
-     do j=0,6*N_BOD
+  do i=1,N_EVAL
+     do j=1,6*N_BOD
         write(44,oftm) partials(j,i,:)
      end do
+     write(44,*) '# t =', i*DELTAT_SAMPLE
   end do
   close(44)
 

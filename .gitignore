@@ -6,7 +6,7 @@ results/*
 *~
 *pyc
 *#
-
+modules/data_planets.f90
 
 # Compiled Object files
 *.slo

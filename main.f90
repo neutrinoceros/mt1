@@ -104,8 +104,8 @@ do while (itime < TMAX)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(10,OFMT1) ftime, Etot, Ltot   
-   itime = itime + SSTEP
-   ftime = ftime + SSTEP
+   itime = itime + ISTEP
+   ftime = ftime + ISTEP
 end do
 print *, "TMAX reached."
 
@@ -134,8 +134,8 @@ do while (ftime .ge. 0)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(11,OFMT1) ftime, Etot, Ltot
-   itime = itime - SSTEP
-   ftime = ftime - SSTEP
+   itime = itime - ISTEP
+   ftime = ftime - ISTEP
 end do
 write(21,OFMT2) itime, Positions
 write(31,OFMT2) itime, Velocities
@@ -172,7 +172,7 @@ do while (date_d < TMAX)
    ! STATE  : 'km km/jday' (position/velocity)
    ! LT     : Light time   (useless to us)
    write(100,OFMT3) date_d, body_state
-   date_d = date_d + SSTEP
+   date_d = date_d + ISTEP
 end do
 
 
