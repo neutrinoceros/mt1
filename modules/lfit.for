@@ -56,6 +56,7 @@ CU    USES covsrt,gaussj
         endif
  21         continue
       chisq=0.
+      rewind(55) ! custom add
       do 23 i=1,ndat
         call funcs(x(i),afunc,ma)
         sum=0.
