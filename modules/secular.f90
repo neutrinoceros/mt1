@@ -4,6 +4,39 @@ use parameters
 
 contains
 
+integer,dimension(11)              :: CENTER ! an integer in [1..N_BOD] for each body = center of rotation (ex : 4 (Earth) for moon)
+CENTER = [1,1,1,1,1,1,1,1,1,1,4]
+
+
+function secular_kepler(x,v)
+  implicit none
+
+  ! EXTERNAL VARIABLES
+  real(8),dimension(3*N_BOD),intent(in) :: x,v
+
+  ! INTERNALS VARIABLES
+  real(8),dimension(6*(N_BOD-1))        :: secular_kepler ! [a,exc,i,Omega,w,MeanMotion] for each body
+  real(8),dimension(3)                  :: x_rel,v_rel
+  real(8),dimension(2)                  :: m
+  integer::i,ci ! i = body ; ci = center(i)
+
+  secular_kepler(:) = 0
+
+! Don't compute it for sun
+  do i = 2,B_BOD
+    ci = CENTER(i)
+    m = [masses(i),masses(ci)]
+    ! relative positions / velocities
+    x_rel(1:3) = x(3*(i-1):3*(i-1)+2) - x(3*(ci-1):3*(ci-1)+2)
+    v_rel(1:3) = v(3*(i-1):3*(i-1)+2) - v(3*(ci-1):3*(ci-1)+2)
+
+    secular_kepler(6(i-1)+1:6(i-1)+6) = kepler(x_rel,v_rel,m)    
+  end do
+
+
+end function secular_kepler
+
+
 function kepler(x,v,m) 
   implicit none
   ! VARIABLES :
@@ -31,10 +64,10 @@ function kepler(x,v,m)
   r = norm(q)
   u = q/r
 
-  ! moment of inertia
+  !moment of inertia
   L = cross(q,s)
   mL = norm(L)
-  k(1:3) = L(1:3)/mL
+  k(1:3) = L(1:3)/mu
 
   ! energy
   h = 0.5*norm2(s) - mu/r
