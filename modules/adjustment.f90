@@ -102,4 +102,37 @@ subroutine computeAllPartials(Xi,Vi,partials)
 end subroutine computeAllPartials
 
 
+subroutine computeCorrections(OminusC,corrections)
+  implicit none
+  integer :: ndat=3*N_BOD*N_EVAL, npc=6*N_BOD, mA,i
+  real(8),dimension(ndat):: X,OminusC        ! X = arange(ndat), OminusC is "obs - code" for positions
+  real(8),dimension(npc) :: corrections
+  integer,dimension(npc) :: IA
+  real(8),dimension(npc,npc) :: covar
+  real(8) :: sig,chisq
+
+  IA(:)      = 1
+  mA         = sum(IA)
+  covar(:,:) = 0d0
+  sig        = 1d0
+  
+  do i=1,ndat
+     X(i) = i
+  end do
+
+  open(55,file='results/alld.dat')
+  call lfit(X,OminusC,sig,ndat,corrections,IA,mA,covar,npc,chisq,readpartials)
+  close(55)
+end subroutine computeCorrections
+
+
+subroutine readpartials(X,line,mA)
+  implicit none
+  real(8),dimension(3*N_BOD) :: X
+  real(8),dimension(6*N_BOD) :: line
+  integer :: mA
+  read(55,"(33E30.16E3)") line
+end subroutine readpartials
+
+
 end module adjustment

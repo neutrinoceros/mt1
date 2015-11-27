@@ -14,7 +14,7 @@ use adjustment
 implicit none
 
 real(8),dimension(:),allocatable :: Positions, Velocities
-integer :: i
+integer :: i,j,k,kk,ll
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 
@@ -30,10 +30,17 @@ character(len=30) :: OFMT1,OFMT2,OFMT3,OFMT4
 !----------------------------
 real(8) :: ET,LT,date_d 
 real(8),dimension(6) :: body_state
+integer :: naifid
+
 ! ET is ...
 ! LT is light-time
 ! date_d is time passed since init_date_jd in days 
 ! body_state is pos/vel of one body ; tmp variable
+
+! fitting corrections vars...
+!----------------------------
+real(8),dimension(3*N_BOD*N_EVAL) :: OminusC
+real(8),dimension(6*N_BOD) :: corrections
 
 !        allocation
 !----------------------------
@@ -72,11 +79,6 @@ if (N_BOD .eq. 2) then
    open(101,file='results/2bodipms_back.dat',status='replace')
 end if
 
-write(10,*) "#     time                         Etot                           Ltot"
-write(10,OFMT1) ftime, Etot, Ltot
-!write(20,*)     '#initial state :'
-!write(20,OFMT2) '#',Positions
-
 print*, 'bodies used are : ', NAMES
 
 
@@ -84,11 +86,15 @@ print*, 'bodies used are : ', NAMES
 !                          main loop
 !================================================================
 
+call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
+ 
 print*, "Entering main loop."
 
 print*, "Starting forward integration..."
 !-----------------------------------------
 
+write(10,*) "#     time                         Etot                           Ltot"
+write(10,OFMT1) ftime, Etot, Ltot
 i=0
 do while (itime < TMAX)
    i = i+1
@@ -104,6 +110,27 @@ do while (itime < TMAX)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(10,OFMT1) ftime, Etot, Ltot   
+   
+   !gen O-C with SPICE
+   !*******************
+   call get_ET(ftime,ET)
+   OminusCline(:) = 0d0
+   do j=1,N_BOD
+      if (j .eq. 1) naifid = 10           ! Sun
+      else if (j .eq. 11)  naifid = 301   ! Moon 
+      else naifid = 100*(j-1)+99          ! systematic id for planets (Mercury --> Pluto)
+      endif
+
+      call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
+      !body_state(1:3) = body_state(1:3)*...     ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
+      do k=1,3
+         kk = k + 3*(j-1)
+         ll = k + 3*(j-1)*(i-1)
+         OminusC(ll) = body_state(k)-Positions(kk)
+      end do
+   end do
+   !*******************
+
    itime = itime + SSTEP
    ftime = ftime + SSTEP
 end do
@@ -153,37 +180,41 @@ close(16)
 !                       load and use SPICE
 !================================================================
 
-print*, "Calling SPICE for comparative results..."
-open(100,file='results/traj_spice.dat',status='replace')
-write(100,*) "# date (from origin, in days), Mercury state (position x,y,z then velocity x,y,z)"
-write(100,*) "# positions in km, velocities in km/day"
+if (N_BOD .eq. 2) then
+   print*, "Calling SPICE for comparative results..."
+   open(100,file='results/traj_spice.dat',status='replace')
+   write(100,*) "# date (from origin, in days), Mercury state (position x,y,z then velocity x,y,z)"
+   write(100,*) "# positions in km, velocities in km/day"
 
-call FURNSH('../toolkit/data/de430.bsp')
-
-date_d = 0d0
-do while (date_d < TMAX)
-   call get_ET(date_d,ET)
-   call SPKEZR('mercury',ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
-   ! target : name body 'venus','mercury'
-   ! ET     : date : [(date+date_ini_JJ)-2451545.do]*86400.do
-   ! REF    : 'J2000'
-   ! ABCORR : 'NONE'
-   ! OSB    : 'SOLAR SYSTEM BARYCENTER'
-   ! STATE  : 'km km/jday' (position/velocity)
-   ! LT     : Light time   (useless to us)
-   write(100,OFMT3) date_d, body_state
-   date_d = date_d + SSTEP
-end do
-
-
+   call FURNSH('../toolkit/data/de430.bsp')
+   
+   date_d = 0d0
+   do while (date_d < TMAX)
+      call get_ET(date_d,ET)
+      call SPKEZR('mercury',ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
+      ! target : name body 'venus','mercury'
+      ! ET     : date : [(date+date_ini_JJ)-2451545.do]*86400.do
+      ! REF    : 'J2000'
+      ! ABCORR : 'NONE'
+      ! OSB    : 'SOLAR SYSTEM BARYCENTER'
+      ! STATE  : 'km km/jday' (position/velocity)
+      ! LT     : Light time   (useless to us)
+      write(100,OFMT3) date_d, body_state
+      date_d = date_d + SSTEP
+   end do
+end if
 
 !================================================================
-!                FINDING ALL DERIVATIVES
+!                    fitting corrections O-C
 !================================================================
 
 print*, 'computation of partial derivatives (long)'
 
 call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
+call computeCorrections(OminusC,corrections)
+
+
+
 
 print*, "Program end."
 
