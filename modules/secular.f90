@@ -1,11 +1,11 @@
 module secular
 use maths
 use parameters
+use data_planets
 
 contains
 
-integer,dimension(11)              :: CENTER ! an integer in [1..N_BOD] for each body = center of rotation (ex : 4 (Earth) for moon)
-CENTER = [1,1,1,1,1,1,1,1,1,1,4]
+
 
 
 function secular_kepler(x,v)
@@ -20,20 +20,24 @@ function secular_kepler(x,v)
   real(8),dimension(2)                  :: m
   integer::i,ci ! i = body ; ci = center(i)
 
+  ! an integer in [1..N_BOD] for each body = center of rotation (ex : 4 (Earth) for moon)
+  integer,dimension(11) :: CENTER 
+
+  CENTER(:) = 1  ! Planets - center : Sun
+  CENTER(11) = 4 ! Moon - center : Earth
+
   secular_kepler(:) = 0
 
 ! Don't compute it for sun
-  do i = 2,B_BOD
+  do i = 2,N_BOD
     ci = CENTER(i)
-    m = [masses(i),masses(ci)]
+    m = [MASSES(i),MASSES(ci)]
     ! relative positions / velocities
     x_rel(1:3) = x(3*(i-1):3*(i-1)+2) - x(3*(ci-1):3*(ci-1)+2)
     v_rel(1:3) = v(3*(i-1):3*(i-1)+2) - v(3*(ci-1):3*(ci-1)+2)
 
     secular_kepler(6(i-1)+1:6(i-1)+6) = kepler(x_rel,v_rel,m)    
   end do
-
-
 end function secular_kepler
 
 
