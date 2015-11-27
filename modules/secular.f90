@@ -74,7 +74,7 @@ function kepler(x,v,m)
   k(1:3) = L(1:3)/mu
 
   ! energy
-  h = 0.5*norm2(s) - mu/r
+  h = (0.5d0)*norm2(s) - mu/r
 
   ! excentricity vector
   v_c = cross(s,L)
