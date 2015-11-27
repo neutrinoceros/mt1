@@ -15,7 +15,7 @@ function secular_kepler(x,v)
 
   ! INTERNALS VARIABLES
   real(8),dimension(6*(N_BOD-1))        :: secular_kepler ! [a,exc,i,Omega,w,MeanMotion] for each body
-  real(8),dimension(3)                  :: x_rel,v_rel
+  real(8),dimension(6)                  :: x_tot,v_tot
   real(8),dimension(2)                  :: m
   integer::i,ci ! i = body ; ci = center(i)
 
@@ -24,7 +24,6 @@ function secular_kepler(x,v)
 
   CENTER(:) = 1  ! Planets - center : Sun
   CENTER(11) = 4 ! Moon - center : Earth
-
   secular_kepler(:) = 0
 
 ! Don't compute it for sun
@@ -32,10 +31,12 @@ function secular_kepler(x,v)
     ci = CENTER(i)
     m = [MASSES(i),MASSES(ci)]
     ! relative positions / velocities
-    x_rel(1:3) = x(3*(i-1):3*(i-1)+2) - x(3*(ci-1):3*(ci-1)+2)
-    v_rel(1:3) = v(3*(i-1):3*(i-1)+2) - v(3*(ci-1):3*(ci-1)+2)
+    x_tot(4:6) = x(3*(i-1):3*(i-1)+2)
+    x_tot(1:3) = x(3*(ci-1):3*(ci-1)+2)
+    v_tot(4:6) = v(3*(i-1):3*(i-1)+2)
+    v_tot(1:3) = v(3*(ci-1):3*(ci-1)+2)
 
-    secular_kepler(6(i-1)+1:6(i-1)+6) = kepler(x_rel,v_rel,m)    
+    secular_kepler(6*(i-1)+1:6*(i-1)+6) = kepler(x_tot,v_tot,m)    
   end do
 end function secular_kepler
 
@@ -98,7 +99,7 @@ function kepler(x,v,m)
 
   w = EQ_sincos(current/(exc*sin(i)),e(3)*sin(i),0e0_wp)
 
-current = (a+r)/(a*exc)
+  current = (a+r)/(a*exc)
   E_E = EQ_sincos(current,xv,0e0_wp)
 
   MeanMotion = E_E - xv/(n*(a**2))

@@ -30,6 +30,7 @@ end function norm2
 !   cos(X) = C
 !   sin(X) = S/w
 ! Why w ? Usefull to avoid division
+! if necessary, w = 0d0_wp for any precision
 
 function EQ_sincos(C,S,w)
   implicit none
