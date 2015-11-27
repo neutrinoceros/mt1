@@ -30,13 +30,13 @@ function secular_kepler(x,v)
   do i = 2,N_BOD
     ci = CENTER(i)
     m = [MASSES(i),MASSES(ci)]
-    ! relative positions / velocities
+    ! positions / velocities
     x_tot(4:6) = x(3*(i-1):3*(i-1)+2)
     x_tot(1:3) = x(3*(ci-1):3*(ci-1)+2)
     v_tot(4:6) = v(3*(i-1):3*(i-1)+2)
     v_tot(1:3) = v(3*(ci-1):3*(ci-1)+2)
 
-    secular_kepler(6*(i-1)+1:6*(i-1)+6) = kepler(x_tot,v_tot,m)    
+    secular_kepler(6*(i-1)+1:6*(i-1)+6) = kepler(x_tot,v_tot,m)
   end do
 end function secular_kepler
 
