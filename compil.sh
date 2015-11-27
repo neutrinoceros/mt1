@@ -6,7 +6,7 @@ COMPILER="gfortran"
 TARGET="program"
 MAIN="main.f90"
 SRC77="modules/RA15M.f"
-SRC90="modules/maths.f90 modules/parameters.f90 modules/data_planets.f90 modules/sub_nbodies.f90 modules/secular.f90"
+SRC90="modules/type_precision.f90 modules/maths.f90 modules/parameters.f90 modules/data_planets.f90 modules/sub_nbodies.f90 modules/secular.f90"
 OUT="maths.o parameters.o data_planets.o sub_nbodies.o secular.o RA15M.o"
 
 #locate the spice library file

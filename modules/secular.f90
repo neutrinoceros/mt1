@@ -2,10 +2,9 @@ module secular
 use maths
 use parameters
 use data_planets
+use type_precision
 
 contains
-
-
 
 
 function secular_kepler(x,v)
@@ -56,7 +55,7 @@ function kepler(x,v,m)
   ! LOCAL VAR :
 
   real(8),dimension(3):: q,s,u,L,k,e,v_c
-  real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,MeanMotion
+  real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,MeanMotion,xv,E_E,n
 
   MeanMotion = -1 !TO DO : IMPLEMENT PROPER COMPUTATION
 
@@ -74,7 +73,8 @@ function kepler(x,v,m)
   k(1:3) = L(1:3)/mu
 
   ! energy
-  h = (0.5d0)*norm2(s) - mu/r
+  h = (0.5e0_wp)*norm2(s) - mu/r
+  xv = dot_product(q,s)
 
   ! excentricity vector
   v_c = cross(s,L)
@@ -85,22 +85,23 @@ function kepler(x,v,m)
   p = norm2(L)/mu
   exc = sqrt(1+2*h*p/mu)
   qp = p/(1+exc)
-  a = p/(1-p**2)
+  a = p/(1-p**2)  
+  n = sqrt(mu/a**3)
 
   ! plan of orbit
   i = Acos(k(3))
 
-  Omega = Acos(-k(2)/sin(i))
-  If ( k(1)*sin(i) < 0 ) Then
-    Omega = -Omega
-  Endif
+  Omega = EQ_sincos(-k(2)/sin(i),k(1)*sin(i),0e0_wp)
 
   v_c = cross(k,e)
   current = v_c(3)
-  w = Acos(current/(exc*sin(i)))
-  If ( e(3)*sin(i) < 0 ) Then
-    w = -w
-  Endif 
+
+  w = EQ_sincos(current/(exc*sin(i)),e(3)*sin(i),0e0_wp)
+
+current = (a+r)/(a*exc)
+  E_E = EQ_sincos(current,xv,0e0_wp)
+
+  MeanMotion = E_E - xv/(n*(a**2))
 
   kepler = [a,exc,i,Omega,w,MeanMotion]
 
