@@ -103,12 +103,13 @@ end subroutine computeAllPartials
 
 
 subroutine computeCorrections(OminusC,corrections)
+  use parameters
   implicit none
   integer :: ndat=3*N_BOD*N_EVAL, npc=6*N_BOD, mA,i
-  real(8),dimension(ndat):: X,OminusC        ! X = arange(ndat), OminusC is "obs - code" for positions
-  real(8),dimension(npc) :: corrections
-  integer,dimension(npc) :: IA
-  real(8),dimension(npc,npc) :: covar
+  real(8),dimension(3*N_BOD*N_EVAL):: X,OminusC        ! X = arange(ndat), OminusC is "obs - code" for positions
+  real(8),dimension(6*N_BOD) :: corrections
+  integer,dimension(6*N_BOD) :: IA
+  real(8),dimension(6*N_BOD,6*N_BOD) :: covar
   real(8) :: sig,chisq
 
   IA(:)      = 1
@@ -127,6 +128,7 @@ end subroutine computeCorrections
 
 
 subroutine readpartials(X,line,mA)
+  use parameters
   implicit none
   real(8),dimension(3*N_BOD) :: X
   real(8),dimension(6*N_BOD) :: line

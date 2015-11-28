@@ -114,11 +114,13 @@ do while (itime < TMAX)
    !gen O-C with SPICE
    !*******************
    call get_ET(ftime,ET)
-   OminusCline(:) = 0d0
    do j=1,N_BOD
-      if (j .eq. 1) naifid = 10           ! Sun
-      else if (j .eq. 11)  naifid = 301   ! Moon 
-      else naifid = 100*(j-1)+99          ! systematic id for planets (Mercury --> Pluto)
+      if (j .eq. 1) then
+         naifid = 10                    ! Sun
+      else if (j .eq. 11) then
+         naifid = 301                   ! Moon 
+      else
+         naifid = 100*(j-1)+99          ! systematic id for planets (Mercury --> Pluto)
       endif
 
       call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
