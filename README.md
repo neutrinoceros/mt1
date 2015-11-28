@@ -49,6 +49,8 @@ available on [Dropbox](https://www.dropbox.com/sh/48ggibduzgidf6v/AAB1_qRgjvUp0z
 
 **debbuging**
 
+* branch 'ajustement' : le calcul des corrections plante après avoir atteint la ligne de alld.dat dont le numéro égale "N\_EVAL * 3 * N\_BOD", ce qui est la dimension du vecteur "OminusC".
+ 
 * ~~none of the planets ever move except for the sun, which trajectory is not even a straight line and depends on integration parameters~~
 * ~~check use of RADAU and computations made in subroutine Forces~~
 * check angular momentum and energy computations
