@@ -1,4 +1,5 @@
 module adjustment
+integer :: COUNTER = 0 ! tmp
 
 contains
 
@@ -121,9 +122,11 @@ subroutine computeCorrections(OminusC,corrections)
      X(i) = i
   end do
 
+  print *,'b1'
   open(55,file='results/alld.dat')
   call lfit(X,OminusC,sig,ndat,corrections,IA,mA,covar,npc,chisq,readpartials)
   close(55)
+  print *,'b2'
 end subroutine computeCorrections
 
 
@@ -131,9 +134,12 @@ subroutine readpartials(X,line,mA)
   use parameters
   implicit none
   real(8),dimension(3*N_BOD) :: X
-  real(8),dimension(6*N_BOD) :: line
+  real(8),dimension(3*N_BOD) :: line
   integer :: mA
-  read(55,"(33E30.16E3)") line
+  COUNTER = COUNTER +1
+  read(55,*) line
+  print*,'in readpartial, counter current value : ',COUNTER, '/', N_EVAL*3*N_BOD
+  !stop
 end subroutine readpartials
 
 

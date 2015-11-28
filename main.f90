@@ -14,7 +14,7 @@ use adjustment
 implicit none
 
 real(8),dimension(:),allocatable :: Positions, Velocities
-integer :: i,j,k,kk,ll
+integer :: i,ii,j,k,kk,ll
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 
@@ -29,8 +29,8 @@ character(len=30) :: OFMT1,OFMT2,OFMT3,OFMT4
 !  SPICE useful variables
 !----------------------------
 real(8) :: ET,LT,date_d 
-real(8),dimension(6) :: body_state
-integer :: naifid
+real(8),dimension(6) :: body_state !meant to store position and velocities of one single body at a time
+character(len=100)   :: naifid
 
 ! ET is ...
 ! LT is light-time
@@ -83,7 +83,7 @@ print*, 'bodies used are : ', NAMES
 
 
 !================================================================
-!                          main loop
+!                          MAIN LOOP
 !================================================================
 
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
@@ -96,6 +96,7 @@ print*, "Starting forward integration..."
 write(10,*) "#     time                         Etot                           Ltot"
 write(10,OFMT1) ftime, Etot, Ltot
 i=0
+ii=0
 do while (itime < TMAX)
    i = i+1
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
@@ -110,29 +111,33 @@ do while (itime < TMAX)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(10,OFMT1) ftime, Etot, Ltot   
-   
+
+
    !gen O-C with SPICE
    !*******************
-   call get_ET(ftime,ET)
-   do j=1,N_BOD
-      if (j .eq. 1) then
-         naifid = 10                    ! Sun
-      else if (j .eq. 11) then
-         naifid = 301                   ! Moon 
-      else
-         naifid = 100*(j-1)+99          ! systematic id for planets (Mercury --> Pluto)
-      endif
-
-      call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
-      !body_state(1:3) = body_state(1:3)*...     ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
-      do k=1,3
-         kk = k + 3*(j-1)
-         ll = k + 3*(j-1)*(i-1)
-         OminusC(ll) = body_state(k)-Positions(kk)
+   if (int(mod(ftime,DELTAT_SAMPLE)) .eq. 0) then
+      ii = ii + 1
+      call get_ET(ftime,ET)
+      do j=1,N_BOD
+         if (j .eq. 1) then
+            write(naifid,*) 10                    ! Sun
+         else if (j .eq. 11) then
+            write(naifid,*) 301                   ! Moon 
+         else
+            write(naifid,*) 100*(j-1)+99          ! systematic id for planets (Mercury --> Pluto)
+         endif
+         
+         call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
+         body_state(1:3) = body_state(1:3) / (M2AU*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
+         do k=1,3
+            kk = k + 3*(j-1)
+            ll = k + 3*(j-1) + 3*N_BOD*(ii-1)
+            OminusC(ll) = body_state(k)-Positions(kk)
+         end do
       end do
-   end do
+   end if
    !*******************
-
+   
    itime = itime + SSTEP
    ftime = ftime + SSTEP
 end do
@@ -177,35 +182,6 @@ if (N_BOD .eq. 2) close(101)
 
 close(16)
 
-
-!================================================================
-!                       load and use SPICE
-!================================================================
-
-if (N_BOD .eq. 2) then
-   print*, "Calling SPICE for comparative results..."
-   open(100,file='results/traj_spice.dat',status='replace')
-   write(100,*) "# date (from origin, in days), Mercury state (position x,y,z then velocity x,y,z)"
-   write(100,*) "# positions in km, velocities in km/day"
-
-   call FURNSH('../toolkit/data/de430.bsp')
-   
-   date_d = 0d0
-   do while (date_d < TMAX)
-      call get_ET(date_d,ET)
-      call SPKEZR('mercury',ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
-      ! target : name body 'venus','mercury'
-      ! ET     : date : [(date+date_ini_JJ)-2451545.do]*86400.do
-      ! REF    : 'J2000'
-      ! ABCORR : 'NONE'
-      ! OSB    : 'SOLAR SYSTEM BARYCENTER'
-      ! STATE  : 'km km/jday' (position/velocity)
-      ! LT     : Light time   (useless to us)
-      write(100,OFMT3) date_d, body_state
-      date_d = date_d + SSTEP
-   end do
-end if
-
 !================================================================
 !                    fitting corrections O-C
 !================================================================
@@ -213,12 +189,45 @@ end if
 print*, 'computation of partial derivatives (long)'
 
 call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
+
+print*, 'fitting of O-C corrections (new feature)...'
 call computeCorrections(OminusC,corrections)
+print *,corrections
 
 
+!================================================================
+!              SPICE sandbox, working call example
+!================================================================
+
+! if (N_BOD .eq. 2) then
+!    print*, "Calling SPICE for comparative results..."
+!    open(100,file='results/traj_spice.dat',status='replace')
+!    write(100,*) "# date (from origin, in days), Mercury state (position x,y,z then velocity x,y,z)"
+!    write(100,*) "# positions in km, velocities in km/day"
+
+!    call FURNSH('../toolkit/data/de430.bsp')
+   
+!    date_d = 0d0
+!    do while (date_d < TMAX)
+!       call get_ET(date_d,ET)
+!       call SPKEZR('mercury',ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
+!       ! target : name body 'venus','mercury'
+!       ! ET     : date : [(date+date_ini_JJ)-2451545.do]*86400.do
+!       ! REF    : 'J2000'
+!       ! ABCORR : 'NONE'
+!       ! OSB    : 'SOLAR SYSTEM BARYCENTER'
+!       ! STATE  : 'km km/jday' (position/velocity)
+!       ! LT     : Light time   (useless to us)
+!       write(100,OFMT3) date_d, body_state
+!       date_d = date_d + SSTEP
+!    end do
+! end if
 
 
+!****************************************************************
 print*, "Program end."
+!****************************************************************
+
 
 !================================================================
 !                       local subroutines

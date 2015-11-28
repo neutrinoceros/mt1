@@ -1,5 +1,7 @@
 module parameters
 
+real(8),parameter :: M2AU = 1.49597870700e11  ! conversion factor for meters to A.U. 
+
 real(8),parameter :: init_date_jd = 2440400.5 ! june 28 1969 in Julian days
 real(8),parameter :: j2000_jd     = 2451545.0 ! january 1st 2000 in Julian days
 
@@ -62,7 +64,7 @@ integer,parameter :: SAMPLERATE = 1
 !======================================================================
 
 real(8),parameter :: EPSILON        = 1e-7        ! approx 10m (in a.u.)
-real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 1e3
+real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 5e3
 integer,parameter :: N_EVAL         = floor(TMAX / DELTAT_SAMPLE)
 
 end module parameters
