@@ -80,7 +80,7 @@ subroutine computeAllPartials(Xi,Vi,partials)
   real(8),dimension(3*N_BOD) :: line
   character(len=30) :: oftm
   
-  oftm = "(33E30.16E3)"
+  oftm = "(66E30.16E3)"                                   ! 66 = 6*N_BOD for max value of N_BOD (11)
 
   !init
   partials(:,:,:) = 0d0
@@ -93,9 +93,9 @@ subroutine computeAllPartials(Xi,Vi,partials)
   print*,'writing'
   !WIP || when ready for launch, export this part of the code to main.f90
   open(44,file='results/alld.dat',status='replace')
-  do i=0,N_EVAL
-     do j=0,6*N_BOD
-        write(44,oftm) partials(j,i,:)
+  do i=1,N_EVAL
+     do j=1,3*N_BOD
+        write(44,oftm) partials(:,i,j)
      end do
   end do
   close(44)
@@ -106,40 +106,40 @@ end subroutine computeAllPartials
 subroutine computeCorrections(OminusC,corrections)
   use parameters
   implicit none
-  integer :: ndat=3*N_BOD*N_EVAL, npc=6*N_BOD, mA,i
-  real(8),dimension(3*N_BOD*N_EVAL):: X,OminusC        ! X = arange(ndat), OminusC is "obs - code" for positions
-  real(8),dimension(6*N_BOD) :: corrections
-  integer,dimension(6*N_BOD) :: IA
+  integer :: ndat=3*N_BOD*N_EVAL, npc=6*N_BOD, ma,i
+  real(8),dimension(3*N_BOD*N_EVAL)  :: X,OminusC,sig     ! X = arange(ndat), OminusC is "obs - code" for positions
+  real(8),dimension(6*N_BOD)         :: corrections
+  integer,dimension(6*N_BOD)         :: ia
   real(8),dimension(6*N_BOD,6*N_BOD) :: covar
-  real(8) :: sig,chisq
+  real(8) :: chisq
 
-  IA(:)      = 1
-  mA         = sum(IA)
+  ia(:)      = 1
+  ma         = npc                                         !6*N_BOD, we do not ignore any parameter
   covar(:,:) = 0d0
-  sig        = 1d0
+  sig(:)     = 1d0
+  chisq      = 0d0
   
   do i=1,ndat
      X(i) = i
   end do
 
-  print *,'b1'
+  print *,'IN !'
   open(55,file='results/alld.dat')
-  call lfit(X,OminusC,sig,ndat,corrections,IA,mA,covar,npc,chisq,readpartials)
+  call lfit(X,OminusC,sig,ndat,corrections,ia,ma,covar,npc,chisq,readpartials)
   close(55)
-  print *,'b2'
+  print *,'OUT !'
 end subroutine computeCorrections
 
 
-subroutine readpartials(X,line,mA)
+subroutine readpartials(x,line,ma)
   use parameters
   implicit none
-  real(8),dimension(3*N_BOD) :: X
+  real(8) :: x
   real(8),dimension(3*N_BOD) :: line
-  integer :: mA
-  COUNTER = COUNTER +1
+  integer :: ma
+  COUNTER = COUNTER + 1
   read(55,*) line
-  print*,'in readpartial, counter current value : ',COUNTER, '/', N_EVAL*3*N_BOD
-  !stop
+  !print*,'in readpartial, counter current value : ',COUNTER, '/', N_EVAL*3*N_BOD
 end subroutine readpartials
 
 

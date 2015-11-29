@@ -37,7 +37,7 @@
         endif
         indxr(i)=irow
         indxc(i)=icol
-        if (a(icol,icol).eq.0.) pause 'singular matrix in gaussj'
+!        if (a(icol,icol).eq.0.) pause 'singular matrix in gaussj'
         pivinv=1./a(icol,icol)
         a(icol,icol)=1.
         do 16 l=1,n
