@@ -192,6 +192,7 @@ call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
 
 print*, 'fitting of O-C corrections (new feature)...'
 call computeCorrections(OminusC,corrections)
+print*, 'RESULTS :'
 print *,corrections
 
 
