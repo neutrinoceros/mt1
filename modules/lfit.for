@@ -1,11 +1,11 @@
       SUBROUTINE lfit(x,y,sig,ndat,a,ia,ma,covar,npc,chisq,funcs)
       INTEGER ma,ia(ma),npc,ndat,MMAX
-      REAL chisq,a(ma),covar(npc,npc),sig(ndat),x(ndat),y(ndat)
+      REAL(8) chisq,a(ma),covar(npc,npc),sig(ndat),x(ndat),y(ndat)
       EXTERNAL funcs
-      PARAMETER (MMAX=50)
+      PARAMETER (MMAX=150)
 CU    USES covsrt,gaussj
       INTEGER i,j,k,l,m,mfit
-      REAL sig2i,sum,wt,ym,afunc(MMAX),beta(MMAX)
+      REAL(8) sig2i,sum,wt,ym,afunc(MMAX),beta(MMAX)
       mfit=0
       do 11 j=1,ma
         if(ia(j).ne.0) mfit=mfit+1

@@ -1,9 +1,9 @@
       SUBROUTINE gaussj(a,n,np,b,m,mp)
       INTEGER m,mp,n,np,NMAX
-      REAL a(np,np),b(np,mp)
-      PARAMETER (NMAX=50)
+      REAL(8) a(np,np),b(np,mp)
+      PARAMETER (NMAX=150)
       INTEGER i,icol,irow,j,k,l,ll,indxc(NMAX),indxr(NMAX),ipiv(NMAX)
-      REAL big,dum,pivinv
+      REAL(8) big,dum,pivinv
       do 11 j=1,n
         ipiv(j)=0
  11         continue

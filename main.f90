@@ -72,7 +72,7 @@ open(20,file='results/traj.dat'        ,status='replace')  ! positions
 open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retour
 open(30,file='results/vel.dat'         ,status='replace')  ! velocities
 open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au retour
-open(116,file='results/out_everhart.dat',status='replace')
+open(16,file='results/out_everhart.dat',status='replace')
 
 if (N_BOD .eq. 2) then
    open(100,file='results/2bodipms.dat',status='replace')
@@ -115,10 +115,15 @@ do while (itime < TMAX)
 
    !gen O-C with SPICE
    !*******************
+
    if (int(mod(ftime,DELTAT_SAMPLE)) .eq. 0) then
       ii = ii + 1
       call get_ET(ftime,ET)
       do j=1,N_BOD
+
+         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         ! TO DO : remake propre de cette horreur
          if (j .eq. 1) then
             write(naifid,*) 10                    ! Sun
          else if (j .eq. 11) then
@@ -134,6 +139,9 @@ do while (itime < TMAX)
          else 
             write(naifid,*) (j-1)         
          endif
+         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
          
          call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
          body_state(1:3) = body_state(1:3) / (M2AU*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
@@ -188,7 +196,7 @@ close(21)
 close(31)
 if (N_BOD .eq. 2) close(101)
 
-close(116)
+close(16)
 
 !================================================================
 !                    fitting corrections O-C

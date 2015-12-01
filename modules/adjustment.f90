@@ -53,27 +53,12 @@ subroutine computeTabDr(Xi,Vi,n,tab_DR)
   open(16,file='results/out_everhart.dat',status='replace')
   do j=1,N_EVAL 
      do while(itime < j*DELTAT_SAMPLE)
-!         if (n.eq.7) then
-!            write(*,*) Xi,Vi
-!            write(*,*) X1,V1
-!            write(*,*) X2,V2
-!            write(*,*)
-! !           stop
-!         end if
         call walk(X1, V1, itime, ftime)
         call walk(X2, V2, itime, ftime)
         itime = itime + SSTEP
         ftime = ftime + SSTEP
      end do
      tab_DR(j,:) = (X1-X2)/(2*EPSILON)
-
-     ! if (n.eq.7) then
-     !    write(*,*) X1(1)-X2(1),EPSILON,(X1(1)-X2(1))/(2*EPSILON)
-     !    write(*,*) X1(1:3),X2(1:3),tab_DR(1,:)
-     !    stop
-     ! end if
-
-
   end do
   close(16)
 
@@ -139,12 +124,6 @@ subroutine computeCorrections(OminusC,corrections)
   end do
 
   open(55,file='results/alld.dat')
-!  write(*,*) size(X),size(OminusC),size(sig),size(corrections),&
-!       size(ia),&
-!       size(covar)
-!  stop
-  ! write(*,*)X,OminusC,sig,ndat,corrections,ia,ma,covar,npc,chisq
-  !  stop
   call lfit(X(:size(X)),OminusC(:size(OminusC)),sig(:size(sig)),ndat,&
        corrections(:size(corrections)),&
        ia,ma,covar,npc,chisq,readpartials)
@@ -158,9 +137,7 @@ subroutine readpartials(x,line,ma)
   real(8) :: x
   real(8),dimension(6*N_BOD) :: line
   integer :: ma
-  !COUNTER = COUNTER + 1
   read(55,*) line
-  !print*,'in readpartial, counter current value : ',COUNTER, '/', N_EVAL*3*N_BOD
 end subroutine readpartials
 
 

@@ -1,8 +1,8 @@
       SUBROUTINE covsrt(covar,npc,ma,ia,mfit)
       INTEGER ma,mfit,npc,ia(ma)
-      REAL covar(npc,npc)
+      REAL(8) covar(npc,npc)
       INTEGER i,j,k
-      REAL swap
+      REAL(8) swap
       do 12 i=mfit+1,ma
         do 11 j=1,i
           covar(i,j)=0.

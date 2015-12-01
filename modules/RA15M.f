@@ -121,7 +121,7 @@ C  values from the predicted B-values, following Eq. (2.7) in text.
       IF(NS/nsor*nsor.EQ.NS) then  
         call SORTIE(X,V,TM,VIP) 
  
-        WRITE(116,*) TM,VIP 
+        WRITE(16,*) TM,VIP 
       end if 
  
 C  Loop 175 is 6 iterations on first sequence and two iterations therafter. 
@@ -250,7 +250,7 @@ C  Return if done.
       IF(.NOT.NPER) GO TO 78 
         call SORTIE(X,V,TD+NS*T,VIP) 
  
-      WRITE(116,*) TM,VIP 
+      WRITE(16,*) TM,VIP 
 cc        call SORTIE(X,V,TF0,VIP) 
  
 **      WRITE(14,7) NF,NS 
