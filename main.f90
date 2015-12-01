@@ -114,33 +114,25 @@ do while (itime < TMAX)
 
 
    !gen O-C with SPICE
-   !*******************
+   !********************************************************
 
    if (int(mod(ftime,DELTAT_SAMPLE)) .eq. 0) then
       ii = ii + 1
       call get_ET(ftime,ET)
       do j=1,N_BOD
 
-         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         ! TO DO : remake propre de cette horreur
+         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         ! translate 'j' to a NAIF id
          if (j .eq. 1) then
             write(naifid,*) 10                    ! Sun
          else if (j .eq. 11) then
-            write(naifid,*) 301                   ! Moon 
-         else if (j .eq. 5) then
-            write(naifid,*) 4                     ! Mars
-         else if (j .eq. 6) then
-            write(naifid,*) 5                     ! Jup
-         else if (j .eq. 7) then
-            write(naifid,*) 6                     ! Sat
-         else if (j .eq. 2 .or. j .eq. 3 .or. j .eq. 4) then
-            write(naifid,*) 100*(j-1)+99         
+            write(naifid,*) 301                   ! Moon          
+         else if (j .ge. 2 .and. j .le. 4) then
+            write(naifid,*) 100*(j-1)+99          ! Mercury, Venus, Earth
          else 
-            write(naifid,*) (j-1)         
+            write(naifid,*) (j-1)                 ! Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
          endif
-         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
          
          call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
@@ -152,7 +144,7 @@ do while (itime < TMAX)
          end do
       end do
    end if
-   !*******************
+   !********************************************************
    
    itime = itime + SSTEP
    ftime = ftime + SSTEP
