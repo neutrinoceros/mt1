@@ -66,13 +66,13 @@ OFMT2 = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat,
 OFMT3 = "(7E30.16E3)"   ! fmt of traj_spice.dat
 OFMT4 = "(7E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
 
-open(10,file='results/ipms.dat'        ,status='replace')  ! intégrales premières
-open(11,file='results/ipms_back.dat'   ,status='replace')  ! intégrales premières, au retour
+open(110,file='results/ipms.dat'        ,status='replace')  ! intégrales premières
+open(111,file='results/ipms_back.dat'   ,status='replace')  ! intégrales premières, au retour
 open(20,file='results/traj.dat'        ,status='replace')  ! positions
 open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retour
 open(30,file='results/vel.dat'         ,status='replace')  ! velocities
 open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au retour
-open(16,file='results/out_everhart.dat',status='replace')
+open(116,file='results/out_everhart.dat',status='replace')
 
 if (N_BOD .eq. 2) then
    open(100,file='results/2bodipms.dat',status='replace')
@@ -93,8 +93,8 @@ print*, "Entering main loop."
 print*, "Starting forward integration..."
 !-----------------------------------------
 
-write(10,*) "#     time                         Etot                           Ltot"
-write(10,OFMT1) ftime, Etot, Ltot
+write(110,*) "#     time                         Etot                           Ltot"
+write(110,OFMT1) ftime, Etot, Ltot
 i=0
 ii=0
 do while (itime < TMAX)
@@ -110,7 +110,7 @@ do while (itime < TMAX)
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(10,OFMT1) ftime, Etot, Ltot   
+   write(110,OFMT1) ftime, Etot, Ltot   
 
 
    !gen O-C with SPICE
@@ -123,8 +123,16 @@ do while (itime < TMAX)
             write(naifid,*) 10                    ! Sun
          else if (j .eq. 11) then
             write(naifid,*) 301                   ! Moon 
-         else
-            write(naifid,*) 100*(j-1)+99          ! systematic id for planets (Mercury --> Pluto)
+         else if (j .eq. 5) then
+            write(naifid,*) 4                     ! Mars
+         else if (j .eq. 6) then
+            write(naifid,*) 5                     ! Jup
+         else if (j .eq. 7) then
+            write(naifid,*) 6                     ! Sat
+         else if (j .eq. 2 .or. j .eq. 3 .or. j .eq. 4) then
+            write(naifid,*) 100*(j-1)+99         
+         else 
+            write(naifid,*) (j-1)         
          endif
          
          call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
@@ -143,7 +151,7 @@ do while (itime < TMAX)
 end do
 print *, "TMAX reached."
 
-close(10)
+close(110)
 close(20)
 close(30)
 if (N_BOD .eq. 2) close(100)
@@ -167,7 +175,7 @@ do while (ftime .ge. 0)
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(11,OFMT1) ftime, Etot, Ltot
+   write(111,OFMT1) ftime, Etot, Ltot
    itime = itime - SSTEP
    ftime = ftime - SSTEP
 end do
@@ -175,12 +183,12 @@ write(21,OFMT2) itime, Positions
 write(31,OFMT2) itime, Velocities
 print*, "T=0 reached."
 
-close(11)
+close(111)
 close(21)
 close(31)
 if (N_BOD .eq. 2) close(101)
 
-close(16)
+close(116)
 
 !================================================================
 !                    fitting corrections O-C
