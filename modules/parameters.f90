@@ -1,5 +1,7 @@
 module parameters
 
+real(8),parameter :: AU2M = 1.49597870700e11  ! conversion factor from A.U. to meters 
+
 real(8),parameter :: init_date_jd = 2440400.5 ! june 28 1969 in Julian days
 real(8),parameter :: j2000_jd     = 2451545.0 ! january 1st 2000 in Julian days
 
@@ -12,7 +14,7 @@ real(8),parameter :: j2000_jd     = 2451545.0 ! january 1st 2000 in Julian days
 ! Saturn    Uranus    Neptune   Pluto     Moon
 !----------------------------------------------------------------------
 
-integer,parameter :: N_BOD = 2
+integer,parameter :: N_BOD = 11
 real(8),parameter :: GCST  = 0.2959122082855911e-3
 
 ! real(8),parameter :: GCST  = 1.50528915669e-17 
@@ -61,8 +63,13 @@ integer,parameter :: SAMPLERATE = 1
 !        derivatives. Should be typically 10 or 100...
 !======================================================================
 
+<<<<<<< HEAD
 real(8),parameter :: EPSILON        = 1e-7        ! approx 10m (in a.u.)
 real(8),parameter :: DELTAT_SAMPLE  = ISTEP !* 1e1
+=======
+real(8),parameter :: EPSILON        = 1e-10        ! approx 10m (in a.u.)
+real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 10
+>>>>>>> ajustement
 integer,parameter :: N_EVAL         = floor(TMAX / DELTAT_SAMPLE)
 
 end module parameters

@@ -1,4 +1,5 @@
 module adjustment
+!integer :: COUNTER = 0 ! tmp
 
 contains
 
@@ -36,7 +37,7 @@ subroutine computeTabDr(Xi,Vi,n,tab_DR)
      X1(n) = Xi(n) + EPSILON
      X2(n) = Xi(n) - EPSILON
   else if (n .gt. 3*N_BOD .and. n .le. 6*N_BOD) then
-     p = n-3*N_BOD
+     p     = n-3*N_BOD
      V1(p) = Vi(p) + EPSILON
      V2(p) = Vi(p) - EPSILON
   else 
@@ -75,32 +76,70 @@ subroutine computeAllPartials(Xi,Vi,partials)
 
   !local
   real(8),dimension(N_EVAL,3*N_BOD) :: tab_DR
-  integer :: l,i,j                                        ! iterators
+  integer :: n,i,j                                        ! iterators
   real(8),dimension(3*N_BOD) :: line
   character(len=30) :: oftm
   
-  oftm = "(33E30.16E3)"
+  oftm = "(66E30.16E3)"                                   ! 66 = 6*N_BOD for max value of N_BOD (11)
 
   !init
   partials(:,:,:) = 0d0
 
-  do l = 1,6*N_BOD
-     call computeTabDr(Xi,Vi,l,tab_DR)
-     partials(l,:,:) = tab_DR
+  do n = 1,6*N_BOD
+     call computeTabDr(Xi,Vi,n,tab_DR)
+     partials(n,:,:) = tab_DR
   end do
 
   print*,'writing'
   !WIP || when ready for launch, export this part of the code to main.f90
   open(44,file='results/alld.dat',status='replace')
   do i=1,N_EVAL
-     do j=1,6*N_BOD
-        write(44,oftm) partials(j,i,:)
+     do j=1,3*N_BOD
+        write(44,oftm) partials(:,i,j)
      end do
      write(44,*) '# t =', i*DELTAT_SAMPLE
   end do
   close(44)
 
 end subroutine computeAllPartials
+
+
+subroutine computeCorrections(OminusC,corrections)
+  use parameters
+  implicit none
+  integer :: ndat=3*N_BOD*N_EVAL, npc=6*N_BOD, ma,i
+  real(8),dimension(3*N_BOD*N_EVAL)  :: X,OminusC,sig     ! X = arange(ndat), OminusC is "obs - code" for positions
+  real(8),dimension(6*N_BOD)         :: corrections
+  integer,dimension(6*N_BOD)         :: ia
+  real(8),dimension(6*N_BOD,6*N_BOD) :: covar
+  real(8) :: chisq
+
+  ia(:)      = 1
+  ma         = npc                                         !6*N_BOD, we do not ignore any parameter
+  covar(:,:) = 0d0
+  sig(:)     = 1d0
+  chisq      = 0d0
+  
+  do i=1,ndat
+     X(i) = i
+  end do
+
+  open(55,file='results/alld.dat')
+  call lfit(X(:size(X)),OminusC(:size(OminusC)),sig(:size(sig)),ndat,&
+       corrections(:size(corrections)),&
+       ia,ma,covar,npc,chisq,readpartials)
+  close(55)
+end subroutine computeCorrections
+
+
+subroutine readpartials(x,line,ma)
+  use parameters
+  implicit none
+  real(8) :: x
+  real(8),dimension(6*N_BOD) :: line
+  integer :: ma
+  read(55,*) line
+end subroutine readpartials
 
 
 end module adjustment
