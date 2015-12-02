@@ -49,11 +49,24 @@ allocate(Velocities(3*N_BOD))
 allocate(partials(6*N_BOD,N_EVAL,3*N_BOD))
 if (N_BOD .eq. 2) allocate(twobod_ipms(6))
 
-!================================================================
-!                       init, file opening...
-!================================================================
 
-print*, "Initializing..."
+print*,"*********************************************************"
+print*,"                    Program ephemerids"
+print*,"*********************************************************"
+print*, 'Parameters : '
+print*,"--------------------------------------"
+print*,"TMAX    =",int(TMAX),"(days)"
+print*,"N_BOD   =",N_BOD
+print*,
+print*,"--------------------------------------"
+print*,"1  Sun       5  Mars      9   Neptune"
+print*,"2  Mercury   6  Jupiter   10  Pluto  "
+print*,"3  Venus     7  Saturn    11  Moon   "
+print*,"4  Earth     8  Uranus               "
+print*,"--------------------------------------"
+print*,
+print*,"init, file opening..."
+
 Positions  = IPOSITIONS
 Velocities = IVELOCITIES
 call Energy(Positions, Velocities, ftime, Etot)
@@ -66,8 +79,8 @@ OFMT2 = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat,
 OFMT3 = "(7E30.16E3)"   ! fmt of traj_spice.dat
 OFMT4 = "(7E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
 
-open(110,file='results/ipms.dat'        ,status='replace')  ! intégrales premières
-open(111,file='results/ipms_back.dat'   ,status='replace')  ! intégrales premières, au retour
+open(110,file='results/ipms.dat'       ,status='replace')  ! intégrales premières
+open(111,file='results/ipms_back.dat'  ,status='replace')  ! intégrales premières, au retour
 open(20,file='results/traj.dat'        ,status='replace')  ! positions
 open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retour
 open(30,file='results/vel.dat'         ,status='replace')  ! velocities
@@ -79,22 +92,18 @@ if (N_BOD .eq. 2) then
    open(101,file='results/2bodipms_back.dat',status='replace')
 end if
 
-print*, 'bodies used are : ', NAMES
-
-
-!================================================================
-!                          MAIN LOOP
-!================================================================
-
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
- 
-print*, "Entering main loop."
 
-print*, "Starting forward integration..."
-!-----------------------------------------
+
+print*,"========================================================"
+print*,"                      MAIN LOOP"
+print*,"========================================================"
 
 write(110,*) "#     time                         Etot                           Ltot"
 write(110,OFMT1) ftime, Etot, Ltot
+
+print*, "Starting forward integration..."
+
 i=0
 ii=0
 do while (itime < TMAX)
@@ -136,7 +145,7 @@ do while (itime < TMAX)
 
          
          call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
-         body_state(1:3) = body_state(1:3) / (M2AU*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
+         body_state(1:3) = body_state(1:3) / (AU2M*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
          do k=1,3
             kk = k + 3*(j-1)
             ll = k + 3*(j-1) + 3*N_BOD*(ii-1)
@@ -149,15 +158,16 @@ do while (itime < TMAX)
    itime = itime + SSTEP
    ftime = ftime + SSTEP
 end do
-print *, "TMAX reached."
 
 close(110)
 close(20)
 close(30)
 if (N_BOD .eq. 2) close(100)
 
+print *, "TMAX reached."
+print*,"--------------------------------------"
 print*, "Starting backward integration..."
-!-----------------------------------------
+
 
 i=0
 itime = ftime
@@ -179,30 +189,29 @@ do while (ftime .ge. 0)
    itime = itime - SSTEP
    ftime = ftime - SSTEP
 end do
+
 write(21,OFMT2) itime, Positions
 write(31,OFMT2) itime, Velocities
-print*, "T=0 reached."
-
 close(111)
 close(21)
 close(31)
+close(16)
 if (N_BOD .eq. 2) close(101)
 
-close(16)
+print*, "T=0 reached."
 
-!================================================================
-!                    fitting corrections O-C
-!================================================================
-
-print*, 'computation of partial derivatives (long)'
+print*,"========================================================="
+print*,"               Fitting corrections O-C (long)"
+print*,"========================================================="
 
 call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
-
-print*, 'fitting of O-C corrections (new feature)...'
 call computeCorrections(OminusC,corrections)
-print*, 'RESULTS :'
-print *,corrections
 
+print*, 'corrections to initial parameters : '
+print*,"--------------------------------------"
+do i=1,6*N_BOD
+   print*,corrections(i)
+end do
 
 !================================================================
 !              SPICE sandbox, working call example
@@ -233,9 +242,9 @@ print *,corrections
 ! end if
 
 
-!****************************************************************
-print*, "Program end."
-!****************************************************************
+print*,"*********************************************************"
+print*,"                    Program end."
+print*,"*********************************************************"
 
 
 !================================================================
