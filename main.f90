@@ -5,7 +5,7 @@ use sub_nbodies
 use parameters
 use data_planets ! initial conditions + MASSES
 use secular
-use adjustment
+use fitcorr
 
 !================================================================
 !                    variables declaration
@@ -18,13 +18,15 @@ integer :: i,ii,j,k,kk,ll
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 
+real(8) :: ct0,ct1,ct2 !cpu times, difference gives time spent
+
 real(8),dimension(:),allocatable :: twobod_ipms
 real(8),dimension(:,:,:),allocatable :: partials
 
 
 ! line formats for out files
 !----------------------------
-character(len=30) :: OFMT1,OFMT2,OFMT3,OFMT4
+character(len=30) :: OFMT1,OFMT2,OFMT3,OFMT4,OFTM44
 
 !  SPICE useful variables
 !----------------------------
@@ -67,17 +69,20 @@ print*,"--------------------------------------"
 print*,
 print*,"init, file opening..."
 
+call cpu_time(ct0)
+
 Positions  = IPOSITIONS
 Velocities = IVELOCITIES
 call Energy(Positions, Velocities, ftime, Etot)
 call AMomentum(Positions, Velocities, ftime, Ltot)
 itime = 0.
 ftime = SSTEP
-OFMT1 = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
-OFMT2 = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat, 
+OFMT1   = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
+OFMT2   = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat, 
                         !        vel.dat, vel_back.dat
-OFMT3 = "(7E30.16E3)"   ! fmt of traj_spice.dat
-OFMT4 = "(7E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
+OFMT3   = "(7E30.16E3)"   ! fmt of traj_spice.dat
+OFMT4   = "(7E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
+OFTM44  = "(66E30.16E3)"  ! fmt of alld.dat
 
 open(110,file='results/ipms.dat'       ,status='replace')  ! intégrales premières
 open(111,file='results/ipms_back.dat'  ,status='replace')  ! intégrales premières, au retour
@@ -86,6 +91,8 @@ open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retou
 open(30,file='results/vel.dat'         ,status='replace')  ! velocities
 open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au retour
 open(16,file='results/out_everhart.dat',status='replace')
+
+open(44,file='results/alld.dat'        ,status='replace')  ! partial derivatives computed and used in fitting o-c corrections
 
 if (N_BOD .eq. 2) then
    open(100,file='results/2bodipms.dat',status='replace')
@@ -204,14 +211,33 @@ print*,"========================================================="
 print*,"               Fitting corrections O-C (long)"
 print*,"========================================================="
 
+call cpu_time(ct1)
+
 call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
+
+print*,'writing'
+do i=1,N_EVAL
+   do j=1,3*N_BOD
+      write(44,OFTM44) partials(:,i,j)
+   end do
+!   write(44,*) '# t =', i*DELTAT_SAMPLE
+end do
+close(44)
+
 call computeCorrections(OminusC,corrections)
 
-print*, 'corrections to initial parameters : '
+print*,"corrections to initial parameters :   "
 print*,"--------------------------------------"
-do i=1,6*N_BOD
-   print*,corrections(i)
+do i=1,N_BOD
+   ii = 6*(i-1)+1
+   print*,NAMES(i)
+   print*,corrections(ii  ), corrections(ii+3)
+   print*,corrections(ii+1), corrections(ii+4)
+   print*,corrections(ii+2), corrections(ii+5)
 end do
+
+call cpu_time(ct2)
+print*,"Time spent on this part of the code :",int(ct2-ct1),"s"
 
 !================================================================
 !              SPICE sandbox, working call example
@@ -242,6 +268,7 @@ end do
 ! end if
 
 
+print*,"Total time spent on execution :",int(ct2-ct0),"s"
 print*,"*********************************************************"
 print*,"                    Program end."
 print*,"*********************************************************"

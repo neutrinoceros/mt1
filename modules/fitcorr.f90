@@ -1,4 +1,4 @@
-module adjustment
+module fitcorr
 !integer :: COUNTER = 0 ! tmp
 
 contains
@@ -78,9 +78,6 @@ subroutine computeAllPartials(Xi,Vi,partials)
   real(8),dimension(N_EVAL,3*N_BOD) :: tab_DR
   integer :: n,i,j                                        ! iterators
   real(8),dimension(3*N_BOD) :: line
-  character(len=30) :: oftm
-  
-  oftm = "(66E30.16E3)"                                   ! 66 = 6*N_BOD for max value of N_BOD (11)
 
   !init
   partials(:,:,:) = 0d0
@@ -89,17 +86,6 @@ subroutine computeAllPartials(Xi,Vi,partials)
      call computeTabDr(Xi,Vi,n,tab_DR)
      partials(n,:,:) = tab_DR
   end do
-
-  print*,'writing'
-  !WIP || when ready for launch, export this part of the code to main.f90
-  open(44,file='results/alld.dat',status='replace')
-  do i=1,N_EVAL
-     do j=1,3*N_BOD
-        write(44,oftm) partials(:,i,j)
-     end do
-     write(44,*) '# t =', i*DELTAT_SAMPLE
-  end do
-  close(44)
 
 end subroutine computeAllPartials
 
@@ -142,4 +128,4 @@ subroutine readpartials(x,line,ma)
 end subroutine readpartials
 
 
-end module adjustment
+end module fitcorr

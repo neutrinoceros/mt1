@@ -63,13 +63,8 @@ integer,parameter :: SAMPLERATE = 1
 !        derivatives. Should be typically 10 or 100...
 !======================================================================
 
-<<<<<<< HEAD
-real(8),parameter :: EPSILON        = 1e-7        ! approx 10m (in a.u.)
-real(8),parameter :: DELTAT_SAMPLE  = ISTEP !* 1e1
-=======
-real(8),parameter :: EPSILON        = 1e-10        ! approx 10m (in a.u.)
+real(8),parameter :: EPSILON        = 1e-10        ! approx 15m (in a.u.) and 15m/day
 real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 10
->>>>>>> ajustement
 integer,parameter :: N_EVAL         = floor(TMAX / DELTAT_SAMPLE)
 
 end module parameters
