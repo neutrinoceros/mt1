@@ -13,7 +13,7 @@ use fitcorr
 
 implicit none
 
-real(8),dimension(:),allocatable :: Positions, Velocities
+real(8),dimension(:),allocatable :: Positions, Velocities, Positions_SPICE
 integer :: i,ii,j,k,kk,ll
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
@@ -48,6 +48,7 @@ real(8),dimension(6*N_BOD) :: corrections
 !----------------------------
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
+allocate(Positions_SPICE(3*N_BOD))
 allocate(partials(6*N_BOD,N_EVAL,3*N_BOD))
 if (N_BOD .eq. 2) allocate(twobod_ipms(6))
 
@@ -59,6 +60,7 @@ print*, 'Parameters : '
 print*,"--------------------------------------"
 print*,"TMAX    =",int(TMAX),"(days)"
 print*,"N_BOD   =",N_BOD
+print*,"N_EVAL  =",N_EVAL
 print*,
 print*,"--------------------------------------"
 print*,"1  Sun       5  Mars      9   Neptune"
@@ -73,25 +75,34 @@ call cpu_time(ct0)
 
 Positions  = IPOSITIONS
 Velocities = IVELOCITIES
+
 call Energy(Positions, Velocities, ftime, Etot)
 call AMomentum(Positions, Velocities, ftime, Ltot)
+
 itime = 0.
 ftime = SSTEP
+
 OFMT1   = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
 OFMT2   = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat, 
-                        !        vel.dat, vel_back.dat
+                          !        vel.dat, vel_back.dat
 OFMT3   = "(7E30.16E3)"   ! fmt of traj_spice.dat
 OFMT4   = "(7E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
 OFTM44  = "(66E30.16E3)"  ! fmt of alld.dat
 
 open(110,file='results/ipms.dat'       ,status='replace')  ! intégrales premières
 open(111,file='results/ipms_back.dat'  ,status='replace')  ! intégrales premières, au retour
+open(1102,file='results/ipms_pf.dat'   ,status='replace')  ! intégrales premières, post fit
+
 open(20,file='results/traj.dat'        ,status='replace')  ! positions
 open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retour
+open(200,file='results/traj_SPICE.dat' ,status='replace')  ! positions SPICE
+open(202,file='results/traj_pf.dat'    ,status='replace')  ! positions post fit
+
 open(30,file='results/vel.dat'         ,status='replace')  ! velocities
 open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au retour
-open(16,file='results/out_everhart.dat',status='replace')
+open(302,file='results/vel_pf.dat'     ,status='replace')  ! velocities post fit
 
+open(16,file='results/out_everhart.dat',status='replace')
 open(44,file='results/alld.dat'        ,status='replace')  ! partial derivatives computed and used in fitting o-c corrections
 
 if (N_BOD .eq. 2) then
@@ -99,7 +110,38 @@ if (N_BOD .eq. 2) then
    open(101,file='results/2bodipms_back.dat',status='replace')
 end if
 
+
+print*,"SPICE trajectories exctraction..."
+print*,"--------------------------------------"
+
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
+do while (itime < TMAX+SSTEP)
+   call get_ET(itime,ET)
+   do j=1,N_BOD
+      
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      ! translate 'j' to a NAIF id
+      if (j .eq. 1) then
+         write(naifid,*) 10                    ! Sun
+      else if (j .eq. 11) then
+         write(naifid,*) 301                   ! Moon          
+      else if (j .ge. 2 .and. j .le. 4) then
+         write(naifid,*) 100*(j-1)+99          ! Mercury, Venus, Earth
+      else 
+         write(naifid,*) (j-1)                 ! Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
+      endif
+      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+      call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
+      body_state(1:3) = body_state(1:3) / (AU2M*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
+
+      k = 1 + 3*(j-1)
+      Positions_SPICE(k:k+2) = body_state(1:3)
+   end do
+   write(200,OFMT2) ftime, Positions_SPICE
+   itime = itime + SSTEP
+end do
+close(200)
 
 
 print*,"========================================================"
@@ -111,8 +153,10 @@ write(110,OFMT1) ftime, Etot, Ltot
 
 print*, "Starting forward integration..."
 
-i=0
-ii=0
+i     = 0
+ii    = 0
+itime = 0.
+ftime = SSTEP
 do while (itime < TMAX)
    i = i+1
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
@@ -126,7 +170,7 @@ do while (itime < TMAX)
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(110,OFMT1) ftime, Etot, Ltot   
+   write(110,OFMT1) ftime, Etot, Ltot
 
 
    !gen O-C with SPICE
@@ -149,7 +193,6 @@ do while (itime < TMAX)
             write(naifid,*) (j-1)                 ! Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
          endif
          !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
          
          call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
          body_state(1:3) = body_state(1:3) / (AU2M*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
@@ -165,11 +208,6 @@ do while (itime < TMAX)
    itime = itime + SSTEP
    ftime = ftime + SSTEP
 end do
-
-close(110)
-close(20)
-close(30)
-if (N_BOD .eq. 2) close(100)
 
 print *, "TMAX reached."
 print*,"--------------------------------------"
@@ -199,11 +237,8 @@ end do
 
 write(21,OFMT2) itime, Positions
 write(31,OFMT2) itime, Velocities
-close(111)
-close(21)
-close(31)
+
 close(16)
-if (N_BOD .eq. 2) close(101)
 
 print*, "T=0 reached."
 
@@ -239,6 +274,35 @@ end do
 call cpu_time(ct2)
 print*,"Time spent on this part of the code :",int(ct2-ct1),"s"
 
+
+print*,"========================================================"
+print*,"                RERUN with corrections"
+print*,"========================================================"
+
+!minimal run, no o-c new eval
+
+Positions  = IPOSITIONS   + corrections(1         :3*N_BOD)
+Velocities = IVELOCITIES  + corrections(3*N_BOD+1 :6*N_BOD)
+
+itime = 0.
+ftime = SSTEP
+i=0
+ii=0
+do while (itime < TMAX)
+   i = i+1
+   if (mod(i,int(SAMPLERATE)) .eq. 0) then 
+      write(202,OFMT2) itime, Positions
+      write(302,OFMT2) itime, Velocities
+   end if
+   call walk(Positions, Velocities, itime, ftime)
+   call Energy(Positions, Velocities, ftime, Etot)
+   call AMomentum(Positions, Velocities, ftime, Ltot)
+   write(1102,OFMT1) ftime, Etot, Ltot
+   itime = itime + SSTEP
+   ftime = ftime + SSTEP
+end do
+
+
 !================================================================
 !              SPICE sandbox, working call example
 !================================================================
@@ -269,10 +333,30 @@ print*,"Time spent on this part of the code :",int(ct2-ct1),"s"
 
 
 print*,"Total time spent on execution :",int(ct2-ct0),"s"
+
 print*,"*********************************************************"
 print*,"                    Program end."
 print*,"*********************************************************"
 
+
+!file closing
+if (N_BOD .eq. 2) close(100)
+if (N_BOD .eq. 2) close(101)
+
+close(110)
+close(1102)
+
+close(20)
+close(202)
+
+close(30)
+close(302)
+
+close(111)
+close(21)
+close(31)
+
+close(44)
 
 !================================================================
 !                       local subroutines

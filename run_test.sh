@@ -30,7 +30,7 @@ else
     cat logcompil.txt
 fi
 
-
+ipython pyplot/see_postfit.py
 #ipython pyplot/traj.py
 #ipython pyplot/ipms.py
 #ipython pyplot/mercurydtest.py
