@@ -117,6 +117,10 @@ print*,"--------------------------------------"
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
 do while (itime < TMAX+SSTEP)
    call get_ET(itime,ET)
+
+   print*,ET/(3600*24)
+   stop 'et'
+
    do j=1,N_BOD
       
       !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -364,12 +368,12 @@ close(44)
 
 contains
 
-subroutine get_ET(date_d,ET)
+subroutine get_ET(date,ET)
   ! converts date from (days past since initial date) to (seconds past since j2000)
   use parameters
   implicit none
-  real(8) :: date_d, ET
-  ET = ((init_date_jd + date_d) - j2000_jd) * 86400d0
+  real(8) :: date, ET
+  ET = ((init_date_jd + date) - j2000_jd) * 86400d0
 end subroutine get_ET
 
 

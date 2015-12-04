@@ -6,6 +6,7 @@
 #
 # vizualization of position difference between our program's 
 # results and SPICE standard ephemerid for all planets
+# two panels, respectivly pre-fit and post-fit
 #================================================================
 
 from pybox import *
@@ -31,7 +32,6 @@ time  = tab1[:,0]
 #  computations
 #=================
 
-dm0 = np.zeros((niter,n_bod), dtype = np.float64)
 dm1 = np.zeros((niter,n_bod), dtype = np.float64)
 dm2 = np.zeros((niter,n_bod), dtype = np.float64)
 
@@ -44,7 +44,6 @@ for i in range(niter) :
 
         dm1[i,j] = distance(p1,p_spice)
         dm2[i,j] = distance(p2,p_spice)
-        dm0[i,j] = distance(p1,p2)
 
 time /= 365             #conversion 'day  --> yr'
 
