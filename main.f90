@@ -30,7 +30,7 @@ character(len=30) :: OFMT1,OFMT2,OFMT3,OFMT4,OFTM44
 
 !  SPICE useful variables
 !----------------------------
-real(8) :: ET,LT,date_d 
+real(8) :: ET,LT !,date_d 
 real(8),dimension(6) :: body_state !meant to store position and velocities of one single body at a time
 character(len=100)   :: naifid
 
@@ -50,6 +50,7 @@ allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
 allocate(partials(6*N_BOD,N_EVAL,3*N_BOD))
 if (N_BOD .eq. 2) allocate(twobod_ipms(6))
+if (N_BOD .gt. 2) allocate(twobod_ipms(6*(N_BOD-1)))
 
 
 print*,"*********************************************************"
@@ -59,6 +60,10 @@ print*, 'Parameters : '
 print*,"--------------------------------------"
 print*,"TMAX    =",int(TMAX),"(days)"
 print*,"N_BOD   =",N_BOD
+print*,
+print*,"Optionnal routines used :"
+print*,"    SWITCH_FIT     ",SWITCH_FIT
+print*,"    SWITCH_SECULAR ",SWITCH_SECULAR 
 print*,
 print*,"--------------------------------------"
 print*,"1  Sun       5  Mars      9   Neptune"
@@ -118,9 +123,14 @@ do while (itime < TMAX)
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
       write(20,OFMT2) itime, Positions
       write(30,OFMT2) itime, Velocities
-      if (N_BOD .eq. 2) then
-         twobod_ipms = kepler(Positions,Velocities,MASSES)
-         write(100,OFMT4) itime, twobod_ipms
+      if (SWITCH_SECULAR .eq. 1) then
+        if (N_BOD .eq. 2) then
+          twobod_ipms = kepler(Positions,Velocities,MASSES)
+          write(100,OFMT4) itime, twobod_ipms
+        else if (N_BOD .ge. 2) then
+          twobod_ipms = secular_kepler(Positions,Velocities)
+          write(100,OFMT4) itime, twobod_ipms
+        end if
       end if
    end if
    call walk(Positions, Velocities, itime, ftime)
