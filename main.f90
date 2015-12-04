@@ -3,6 +3,7 @@ program ephemerids
 use maths
 use sub_nbodies
 use parameters
+use secular
 use data_planets ! initial conditions + MASSES
 
 
@@ -17,14 +18,16 @@ integer :: i
 real(8) :: itime, ftime
 real(8) :: Etot, Ltot
 
-real(8),dimension(:),allocatable :: twobod_imps
+real(8),dimension(:),allocatable :: twobod_ipms
 
 ! line formats for out files
 !----------------------------
+
 character(len=30) :: OFMT1,OFMT2,OFMT3 
 
 !  SPICE useful variables
 !----------------------------
+
 real(8) :: ET,LT,date_d 
 real(8),dimension(6) :: body_state
 ! ET is ...
@@ -34,6 +37,7 @@ real(8),dimension(6) :: body_state
 
 !        allocation
 !----------------------------
+
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
 if (N_BOD .eq. 2) allocate(twobod_ipms(6))
@@ -97,7 +101,7 @@ do while (itime < TMAX)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(10,OFMT1) ftime, Etot, Ltot
    if (N_BOD .eq. 2) then
-      twobod_imps = kepler(Positions,Velocities,MASSES)
+      twobod_ipms = kepler(Positions,Velocities,MASSES)
       write(100,OFTM4) twobod_ipms
    end if
    
@@ -128,7 +132,7 @@ do while (ftime .ge. 0)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(11,OFMT1) ftime, Etot, Ltot
    if (N_BOD .eq. 2) then
-      twobod_imps = kepler(Positions,Velocities,MASSES)
+      twobod_ipms = kepler(Positions,Velocities,MASSES)
       write(101,OFTM4) twobod_ipms
    end if
    
