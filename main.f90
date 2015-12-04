@@ -264,7 +264,7 @@ print*,"Time spent on this part of the code :",int(ct2-ct1),"s"
 
 !    call FURNSH('../toolkit/data/de430.bsp')
    
-!    date_d = 0d0
+!    date_d = 0d0 (or e0_wp)
 !    do while (date_d < TMAX)
 !       call get_ET(date_d,ET)
 !       call SPKEZR('mercury',ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
@@ -298,7 +298,7 @@ subroutine get_ET(date_d,ET)
   use parameters
   implicit none
   real(8) :: date_d, ET
-  ET = ((init_date_jd + date_d) - j2000_jd) * 86400d0
+  ET = ((init_date_jd + date_d) - j2000_jd) * 86400e0_wp
 end subroutine get_ET
 
 

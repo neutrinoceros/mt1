@@ -14,7 +14,7 @@ real(8),parameter :: j2000_jd     = 2451545.0 ! january 1st 2000 in Julian days
 ! Saturn    Uranus    Neptune   Pluto     Moon
 !----------------------------------------------------------------------
 
-integer,parameter :: N_BOD = 2
+integer,parameter :: N_BOD = 11
 real(8),parameter :: GCST  = 0.2959122082855911e-3
 
 ! real(8),parameter :: GCST  = 1.50528915669e-17 

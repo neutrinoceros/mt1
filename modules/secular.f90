@@ -35,8 +35,10 @@ function secular_kepler(x,v)
     x_tot(1:3) = x(3*ci-2:3*i)
     v_tot(4:6) = v(3*i-2:3*i)
     v_tot(1:3) = v(3*ci-2:3*i)
+    print*,"x_tot",i,x_tot
+    print*,"v_tot",i,v_tot
     secular_kepler(6*(i-1)+1:6*(i-1)+6) = kepler(x_tot,v_tot,m)
-    print*,secular_kepler
+    !print*,secular_kepler
   end do
 end function secular_kepler
 
