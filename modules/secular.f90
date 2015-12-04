@@ -31,7 +31,7 @@ function kepler(x,v,m)
   r = norm(q)
   u = q/r
 
-  !moment of inertia
+  ! moment of inertia
   L = cross(q,s)
   mL = norm(L)
   k(1:3) = L(1:3)/mL

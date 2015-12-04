@@ -246,34 +246,36 @@ close(16)
 
 print*, "T=0 reached."
 
-print*,"========================================================="
-print*,"               Fitting corrections O-C (long)"
-print*,"========================================================="
+if (SWITCH_FIT .eq. 1)
+  print*,"========================================================="
+  print*,"               Fitting corrections O-C (long)"
+  print*,"========================================================="
 
-call cpu_time(ct1)
+  call cpu_time(ct1)
 
-call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
+  call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
 
-print*,'writing'
-do i=1,N_EVAL
-   do j=1,3*N_BOD
-      write(44,OFTM44) partials(:,i,j)
-   end do
-!   write(44,*) '# t =', i*DELTAT_SAMPLE
-end do
-close(44)
+  print*,'writing'
+  do i=1,N_EVAL
+     do j=1,3*N_BOD
+        write(44,OFTM44) partials(:,i,j)
+     end do
+  !   write(44,*) '# t =', i*DELTAT_SAMPLE
+  end do
+  close(44)
 
-call computeCorrections(OminusC,corrections)
+  call computeCorrections(OminusC,corrections)
 
-print*,"corrections to initial parameters :   "
-print*,"--------------------------------------"
-do i=1,N_BOD
-   ii = 6*(i-1)+1
-   print*,NAMES(i)
-   print*,corrections(ii  ), corrections(ii+3)
-   print*,corrections(ii+1), corrections(ii+4)
-   print*,corrections(ii+2), corrections(ii+5)
-end do
+  print*,"corrections to initial parameters :   "
+  print*,"--------------------------------------"
+  do i=1,N_BOD
+     ii = 6*(i-1)+1
+     print*,NAMES(i)
+     print*,corrections(ii  ), corrections(ii+3)
+     print*,corrections(ii+1), corrections(ii+4)
+     print*,corrections(ii+2), corrections(ii+5)
+  end do
+end if
 
 call cpu_time(ct2)
 print*,"Time spent on this part of the code :",int(ct2-ct1),"s"

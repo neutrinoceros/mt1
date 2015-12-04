@@ -67,4 +67,9 @@ real(8),parameter :: EPSILON        = 1e-10        ! approx 15m (in a.u.) and 15
 real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 10
 integer,parameter :: N_EVAL         = floor(TMAX / DELTAT_SAMPLE)
 
+! these are switch ; if switch = 1 main call a subroutine/function/w-e, else don't
+
+integer,parameter :: SWITCH_SECULAR = 1
+integer,parameter :: SWITCH_FIT		= 0
+
 end module parameters
