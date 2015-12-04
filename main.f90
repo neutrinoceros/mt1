@@ -127,7 +127,9 @@ do while (itime < TMAX)
         if (N_BOD .eq. 2) then
           twobod_ipms = kepler(Positions,Velocities,MASSES)
           write(100,OFMT4) itime, twobod_ipms
-        else if (N_BOD .ge. 2) then
+        end if
+        if (N_BOD .eq. 11) then
+          print*,"kepler"
           twobod_ipms = secular_kepler(Positions,Velocities)
           write(100,OFMT4) itime, twobod_ipms
         end if
@@ -216,13 +218,12 @@ close(16)
 if (N_BOD .eq. 2) close(101)
 
 print*, "T=0 reached."
+call cpu_time(ct1)
 
 if (SWITCH_FIT .eq. 1) then
   print*,"========================================================="
   print*,"               Fitting corrections O-C (long)"
   print*,"========================================================="
-
-  call cpu_time(ct1)
 
   call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
 

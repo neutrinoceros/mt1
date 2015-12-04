@@ -31,12 +31,12 @@ function secular_kepler(x,v)
     ci = CENTER(i)
     m = [MASSES(i),MASSES(ci)]
     ! positions / velocities
-    x_tot(4:6) = x(3*(i-1):3*(i-1)+2)
-    x_tot(1:3) = x(3*(ci-1):3*(ci-1)+2)
-    v_tot(4:6) = v(3*(i-1):3*(i-1)+2)
-    v_tot(1:3) = v(3*(ci-1):3*(ci-1)+2)
-
+    x_tot(4:6) = x(3*i-2:3*i)
+    x_tot(1:3) = x(3*ci-2:3*i)
+    v_tot(4:6) = v(3*i-2:3*i)
+    v_tot(1:3) = v(3*ci-2:3*i)
     secular_kepler(6*(i-1)+1:6*(i-1)+6) = kepler(x_tot,v_tot,m)
+    print*,secular_kepler
   end do
 end function secular_kepler
 
@@ -55,8 +55,8 @@ function kepler(x,v,m)
 
   ! LOCAL VAR :
 
-  real(8),dimension(3):: q,s,u,L,k,e,v_c
-  real(8):: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,MeanMotion,xv,E_E,n
+  real(8),dimension(3) :: q,s,u,L,k,e,v_c
+  real(8) :: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,MeanMotion,xv,E_E,n
 
   MeanMotion = -1 ! TO DO : IMPLEMENT PROPER COMPUTATION
 
