@@ -102,9 +102,9 @@ end if
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
 
 
-print*,"========================================================"
-print*,"                      MAIN LOOP"
-print*,"========================================================"
+print*,"========================================================="
+print*,"                       MAIN LOOP"
+print*,"========================================================="
 
 write(110,*) "#     time                         Etot                           Ltot"
 write(110,OFMT1) ftime, Etot, Ltot
@@ -207,7 +207,7 @@ if (N_BOD .eq. 2) close(101)
 
 print*, "T=0 reached."
 
-if (SWITCH_FIT .eq. 1)
+if (SWITCH_FIT .eq. 1) then
   print*,"========================================================="
   print*,"               Fitting corrections O-C (long)"
   print*,"========================================================="
