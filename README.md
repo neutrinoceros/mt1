@@ -79,3 +79,9 @@ available on [Dropbox](https://www.dropbox.com/sh/48ggibduzgidf6v/AAB1_qRgjvUp0z
 * [ ] write a decent Makefile (compilation is currently crudely made with a hard-to-edit shell script compil.sh)
 * [x] use double precision
 * [ ] use kepler routine for 11-body problem (and see perihelie evolution)
+* [ ] optionnal computation (secular, post-fit, corrections)
+
+
+TIPS :
+
+* You need compile spicelib (chmod +x makeall.csh) in toolkit
