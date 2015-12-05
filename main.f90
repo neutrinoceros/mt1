@@ -3,7 +3,7 @@ program ephemerids
 use maths
 use sub_nbodies
 use parameters
-use data_planets ! initial conditions + MASSES
+use data_planets ! MASSES
 use secular
 use fitcorr
 
@@ -13,6 +13,7 @@ use fitcorr
 
 implicit none
 
+real(8),dimension(:),allocatable :: IPositions, IVelocities
 real(8),dimension(:),allocatable :: Positions, Velocities, Positions_SPICE
 integer :: i,ii,j,k,kk,ll
 real(8) :: itime, ftime,tmptime
@@ -46,6 +47,8 @@ real(8),dimension(6*N_BOD) :: corrections
 
 !        allocation
 !----------------------------
+allocate(IPositions(3*N_BOD))
+allocate(IVelocities(3*N_BOD))
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
 allocate(Positions_SPICE(3*N_BOD))
@@ -112,7 +115,6 @@ ftime = SSTEP
 
 do while (itime .le. TMAX)
    call get_ET(itime,ET)
-
    do j=1,N_BOD      
       call translate2NAIF(j,naifid)
       call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
@@ -127,8 +129,18 @@ do while (itime .le. TMAX)
 end do
 close(200)
 
+!*******************************************
+!        initialisation (wip)
+!*******************************************
 
-
+call get_ET(0d0,ET)
+do j=1,N_BOD      
+   call translate2NAIF(j,naifid)
+   call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
+   k = 1 + 3*(j-1)
+   IPositions(k:k+2)  = body_state(1:3) / (AU2M*1e-3)               ! BODY_STATE(1:3) is position IN KILOMETERS   (convert to AU)
+   IVelocities(k:k+2) = body_state(4:6) / (AU2M*1e-3) * 24d0*3600d0 ! BODY_STATE(4:6) is velocity IN KILOMETERS/S (convert to AU/day)
+end do
 
 print*,"========================================================"
 print*,"                      MAIN LOOP"
@@ -150,7 +162,7 @@ call AMomentum(Positions, Velocities, ftime, Ltot)
 write(110,*) "#     time                         Etot                           Ltot"
 write(110,OFMT1) ftime, Etot, Ltot
 
-do while (itime < TMAX)
+do while (itime .le. TMAX)
    i = i+1
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
       write(20,OFMT2) itime, Positions
@@ -261,7 +273,7 @@ itime = 0.
 ftime = SSTEP
 i=0
 ii=0
-do while (itime < TMAX)
+do while (itime .le. TMAX)
    i = i+1
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
       write(202,OFMT2) itime, Positions

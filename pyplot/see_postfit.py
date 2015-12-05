@@ -62,5 +62,5 @@ ax0.set_ylabel(r'$|\overrightarrow{r}_{pre fit}-\overrightarrow{r}_{SPICE}|$ [a.
 ax1.set_ylabel(r'$|\overrightarrow{r}_{post fit}-\overrightarrow{r}_{SPICE}|$ [a.u.]' ,size=SIZE)
 ax1.set_xlabel(r'$t$ [yr]',size=SIZE)
 
-ax0.legend(ncol=3, frameon=False,loc=4)
+ax0.legend(ncol=3, frameon=False,loc=2)
 pl.show()

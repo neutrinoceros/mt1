@@ -81,21 +81,21 @@ for i in range(n_bod) :
     else :
         dm += '/)\n\n'
 
-dm += '\treal(8),parameter,dimension(3*N_BOD) :: IPOSITIONS=(/ &\n'
-for i in range(n_bod) :
-    dm += '\t\t'+','.join(POS[3*i:3*i+3])
-    if i < n_bod - 1 :
-        dm += ',&\n'
-    else :
-        dm += '/)\n\n'
+# dm += '\treal(8),parameter,dimension(3*N_BOD) :: IPOSITIONS=(/ &\n'
+# for i in range(n_bod) :
+#     dm += '\t\t'+','.join(POS[3*i:3*i+3])
+#     if i < n_bod - 1 :
+#         dm += ',&\n'
+#     else :
+#         dm += '/)\n\n'
 
-dm += '\treal(8),dimension(3*N_BOD),parameter :: IVELOCITIES=(/ &\n'
-for i in range(n_bod) :
-    dm += '\t\t'+','.join(VEL[3*i:3*i+3])
-    if i < n_bod - 1 :
-        dm += ',&\n'
-    else :
-        dm += '/)\n'
+# dm += '\treal(8),dimension(3*N_BOD),parameter :: IVELOCITIES=(/ &\n'
+# for i in range(n_bod) :
+#     dm += '\t\t'+','.join(VEL[3*i:3*i+3])
+#     if i < n_bod - 1 :
+#         dm += ',&\n'
+#     else :
+#         dm += '/)\n'
 
 dm += '\nend module data_planets\n'
 with open('./modules/data_planets.f90','w') as flux :
