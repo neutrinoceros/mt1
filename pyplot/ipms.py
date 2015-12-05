@@ -37,6 +37,6 @@ ax.set_xlim(min(t),max(t))
 ax.set_xlabel(r'$t$ [yr]',size=SIZE)
 ax.set_ylabel(r'err$(\psi)=|\psi-\psi_0|/\psi_0$',size=SIZE)
 
-ax.legend(frameon=False,loc=4,fontsize=SIZE)
+ax.legend(frameon=False,loc=2,fontsize=SIZE)
 
 pl.show()

@@ -160,7 +160,7 @@ open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au reto
 open(200,file='results/traj_SPICE.dat'                  )  ! for reading
 
 !subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
-call run(Positions,Velocities,Etot,Ltot,TMAX,0d0,OminusC,21,31,200,111) 
+call run(Positions,Velocities,Etot,Ltot,TMAX,0d0,OminusC,21,31,200,111)
 
 close(111)
 close(21)
@@ -214,11 +214,11 @@ if (SWITCH_FIT .eq. 1) then
      Positions  = IPositions
      Velocities = IVelocities
 
-     !***********************************************************************
+     !**************************************************************************
      !                                      202,   302,    200,      1102
      !subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
      call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,202,302,200,1102) 
-     !***********************************************************************
+     !**************************************************************************
 
      close(16)
      close(1102)
@@ -279,69 +279,5 @@ subroutine translate2NAIF(j,naifid)
   endif
 end subroutine translate2NAIF
 
-
-subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
-  use parameters
-  use formats
-  implicit none
-
-  real(8) :: itime,ftime,t0,t1,tmptime,E,L
-  integer :: trajunit,velunit,spiceunit,ipmsunit
-  real(8),dimension(3*N_BOD) :: X,V,X_SPICE
-  real(8),dimension(3*N_BOD*N_EVAL) :: OC          ! O-C
-  !local
-  integer :: i,ii,k
-
-  ii = 0
-  
-  if (t1 .gt. t0) then
-     itime = t0
-     ftime = itime + SSTEP
-
-     do while (itime .le. t1)
-        write(trajunit,OFMT2) itime, X
-        write(velunit, OFMT2) itime, V
-        call Energy(X, V, itime, E)
-        call AMomentum(X, V, itime, L)
-        write(ipmsunit,OFMT1) itime, E, L
-
-        !gen O-C with SPICE
-        !********************************************************
-        read(spiceunit,*) tmptime, X_SPICE
-        if (int(mod(itime,DELTAT_SAMPLE)) .eq. 0) then
-           ii = ii + 1
-           k  = 3*N_BOD*(ii-1) + 1 
-           OC(k:k+3*N_BOD-1) = X_SPICE - X
-        end if
-        !********************************************************
-        if (itime .lt. t1) then
-           call walk(X, V, itime, ftime)
-        end if
-
-        itime = itime + SSTEP
-        ftime = ftime + SSTEP
-     end do
-
-  else if (t1 .lt. t0) then
-     itime = t0
-     ftime = itime - SSTEP
-     do while (ftime .ge. -SSTEP)
-        write(trajunit,OFMT2) itime, X
-        write(velunit, OFMT2) itime, V
-        call Energy(X, V, itime, E)
-        call AMomentum(X, V, itime, L)
-        write(ipmsunit,OFMT1) itime, E, L
-        if (ftime .gt. -SSTEP) then
-           call walk(X, V, itime, ftime)
-        end if
-
-        itime = itime - SSTEP
-        ftime = ftime - SSTEP
-     end do
-  else
-     print*,"error in run : starting and ending times must be different"
-  end if
-
-end subroutine run
 
 end program ephemerids
