@@ -73,15 +73,6 @@ print*,"init, file opening..."
 
 call cpu_time(ct0)
 
-Positions  = IPOSITIONS
-Velocities = IVELOCITIES
-
-call Energy(Positions, Velocities, ftime, Etot)
-call AMomentum(Positions, Velocities, ftime, Ltot)
-
-itime = 0.
-ftime = SSTEP
-
 OFMT1   = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
 OFMT2   = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat, 
                           !        vel.dat, vel_back.dat
@@ -115,24 +106,15 @@ print*,"SPICE trajectories exctraction..."
 print*,"--------------------------------------"
 
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
+
+itime = 0.
+ftime = SSTEP
+
 do while (itime .le. TMAX)
    call get_ET(itime,ET)
 
-   do j=1,N_BOD
-      
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      ! translate 'j' to a NAIF id
-      if (j .eq. 1) then
-         write(naifid,*) 10                    ! Sun
-      else if (j .eq. 11) then
-         write(naifid,*) 301                   ! Moon          
-      else if (j .ge. 2 .and. j .le. 4) then
-         write(naifid,*) 100*(j-1)+99          ! Mercury, Venus, Earth
-      else 
-         write(naifid,*) (j-1)                 ! Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
-      endif
-      !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      
+   do j=1,N_BOD      
+      call translate2NAIF(j,naifid)
       call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
       body_state(1:3) = body_state(1:3) / (AU2M*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
 
@@ -146,12 +128,11 @@ end do
 close(200)
 
 
+
+
 print*,"========================================================"
 print*,"                      MAIN LOOP"
 print*,"========================================================"
-
-write(110,*) "#     time                         Etot                           Ltot"
-write(110,OFMT1) ftime, Etot, Ltot
 
 open(200,file='results/traj_SPICE.dat')   ! for reading
 
@@ -161,6 +142,14 @@ i     = 0
 ii    = 0
 itime = 0.
 ftime = SSTEP
+Positions  = IPOSITIONS
+Velocities = IVELOCITIES
+
+call Energy(Positions, Velocities, ftime, Etot)
+call AMomentum(Positions, Velocities, ftime, Ltot)
+write(110,*) "#     time                         Etot                           Ltot"
+write(110,OFMT1) ftime, Etot, Ltot
+
 do while (itime < TMAX)
    i = i+1
    if (mod(i,int(SAMPLERATE)) .eq. 0) then 
@@ -355,6 +344,23 @@ subroutine get_ET(date,ET)
   real(8) :: date, ET
   ET = ((init_date_jd + date) - j2000_jd) * 86400d0
 end subroutine get_ET
+
+
+subroutine translate2NAIF(j,naifid)
+  implicit none
+  integer :: j
+  character(len=100)   :: naifid
+  ! translate j, iterator on N_BOD to a NAIF id
+  if (j .eq. 1) then
+     write(naifid,*) 10                    ! Sun
+  else if (j .eq. 11) then
+     write(naifid,*) 301                   ! Moon          
+  else if (j .ge. 2 .and. j .le. 4) then
+     write(naifid,*) 100*(j-1)+99          ! Mercury, Venus, Earth
+  else 
+     write(naifid,*) (j-1)                 ! Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
+  endif
+end subroutine translate2NAIF
 
 
 end program ephemerids

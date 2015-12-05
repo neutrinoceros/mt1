@@ -52,8 +52,10 @@ time /= 365             #conversion 'day  --> yr'
 fig, (ax0, ax1) = pl.subplots(nrows=2, sharex=True)
 
 for j in range(n_bod) :    #n_bod
-    ax0.semilogy(time,dm1[:,j],lw=2,alpha=ALPHA,ls='-',c=COLORS[j],label=NAMES[j])
-    ax1.semilogy(time,dm2[:,j],lw=2,alpha=ALPHA,ls='-',c=COLORS[j])
+#    ax0.semilogy(time,dm1[:,j],lw=2,alpha=ALPHA,ls='-',c=COLORS[j],label=NAMES[j])
+#    ax1.semilogy(time,dm2[:,j],lw=2,alpha=ALPHA,ls='-',c=COLORS[j])
+    ax0.plot(time,dm1[:,j],lw=2,alpha=ALPHA,ls='-',c=COLORS[j],label=NAMES[j])
+    ax1.plot(time,dm2[:,j],lw=2,alpha=ALPHA,ls='-',c=COLORS[j])
 
 ax0.set_xlim(min(time),max(time))
 ax0.set_ylabel(r'$|\overrightarrow{r}_{pre fit}-\overrightarrow{r}_{SPICE}|$ [a.u.]'  ,size=SIZE)
