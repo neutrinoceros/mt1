@@ -15,7 +15,7 @@ implicit none
 
 real(8),dimension(:),allocatable :: Positions, Velocities, Positions_SPICE
 integer :: i,ii,j,k,kk,ll
-real(8) :: itime, ftime
+real(8) :: itime, ftime,tmptime
 real(8) :: Etot, Ltot
 
 real(8) :: ct0,ct1,ct2 !cpu times, difference gives time spent
@@ -115,11 +115,8 @@ print*,"SPICE trajectories exctraction..."
 print*,"--------------------------------------"
 
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
-do while (itime < TMAX+SSTEP)
+do while (ftime .le. TMAX)
    call get_ET(itime,ET)
-
-   print*,ET/(3600*24)
-   stop 'et'
 
    do j=1,N_BOD
       
@@ -142,8 +139,9 @@ do while (itime < TMAX+SSTEP)
       k = 1 + 3*(j-1)
       Positions_SPICE(k:k+2) = body_state(1:3)
    end do
-   write(200,OFMT2) ftime, Positions_SPICE
+   write(200,OFMT2) itime, Positions_SPICE
    itime = itime + SSTEP
+   ftime = ftime + SSTEP
 end do
 close(200)
 
@@ -154,6 +152,8 @@ print*,"========================================================"
 
 write(110,*) "#     time                         Etot                           Ltot"
 write(110,OFMT1) ftime, Etot, Ltot
+
+open(200,file='results/traj_SPICE.dat')   ! for reading
 
 print*, "Starting forward integration..."
 
@@ -171,43 +171,21 @@ do while (itime < TMAX)
          write(100,OFMT4) itime, twobod_ipms
       end if
    end if
+
+   !gen O-C with SPICE
+   !********************************************************
+   read(200,*) tmptime, Positions_SPICE
+   if (int(mod(itime,DELTAT_SAMPLE)) .eq. 0) then
+      ii = ii + 1
+      k  = 3*N_BOD*(ii-1) + 1 
+      OminusC(k:k+3*N_BOD-1) = Positions_SPICE - Positions
+   end if
+   !********************************************************
+
    call walk(Positions, Velocities, itime, ftime)
    call Energy(Positions, Velocities, ftime, Etot)
    call AMomentum(Positions, Velocities, ftime, Ltot)
    write(110,OFMT1) ftime, Etot, Ltot
-
-
-   !gen O-C with SPICE
-   !********************************************************
-
-   if (int(mod(ftime,DELTAT_SAMPLE)) .eq. 0) then
-      ii = ii + 1
-      call get_ET(ftime,ET)
-      do j=1,N_BOD
-
-         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         ! translate 'j' to a NAIF id
-         if (j .eq. 1) then
-            write(naifid,*) 10                    ! Sun
-         else if (j .eq. 11) then
-            write(naifid,*) 301                   ! Moon          
-         else if (j .ge. 2 .and. j .le. 4) then
-            write(naifid,*) 100*(j-1)+99          ! Mercury, Venus, Earth
-         else 
-            write(naifid,*) (j-1)                 ! Mars, Jupiter, Saturn, Uranus, Neptune, Pluto
-         endif
-         !~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         
-         call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
-         body_state(1:3) = body_state(1:3) / (AU2M*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
-         do k=1,3
-            kk = k + 3*(j-1)
-            ll = k + 3*(j-1) + 3*N_BOD*(ii-1)
-            OminusC(ll) = body_state(k)-Positions(kk)
-         end do
-      end do
-   end if
-   !********************************************************
    
    itime = itime + SSTEP
    ftime = ftime + SSTEP
@@ -246,7 +224,7 @@ close(16)
 
 print*, "T=0 reached."
 
-if (SWITCH_FIT .eq. 1)
+if (SWITCH_FIT .eq. 1) then
   print*,"========================================================="
   print*,"               Fitting corrections O-C (long)"
   print*,"========================================================="
