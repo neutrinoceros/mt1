@@ -115,7 +115,7 @@ print*,"SPICE trajectories exctraction..."
 print*,"--------------------------------------"
 
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
-do while (ftime .le. TMAX)
+do while (itime .le. TMAX)
    call get_ET(itime,ET)
 
    do j=1,N_BOD
