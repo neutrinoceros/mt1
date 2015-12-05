@@ -7,7 +7,7 @@ pass=0
 START=$(date +%s)
 
 ./compil.sh &> logcompil.txt
-grep "Error\|erreur\|Erreur" logcompil.txt > /dev/null
+grep "Error\|error\|erreur\|Erreur" logcompil.txt > /dev/null
 # if grep returns 1 : compilation OK / if 0 ir means grep found someth so compilation faile
 # Error | Erreur cause of gfortran can write in french :'(
 

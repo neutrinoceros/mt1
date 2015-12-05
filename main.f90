@@ -6,6 +6,7 @@ use parameters
 use data_planets ! MASSES
 use secular
 use fitcorr
+use formats
 
 !================================================================
 !                    variables declaration
@@ -24,10 +25,6 @@ real(8) :: ct0,ct1,ct2 !cpu times, difference gives time spent
 real(8),dimension(:),allocatable :: twobod_ipms
 real(8),dimension(:,:,:),allocatable :: partials
 
-
-! line formats for out files
-!----------------------------
-character(len=30) :: OFMT1,OFMT2,OFMT3,OFMT4,OFTM44
 
 !  SPICE useful variables
 !----------------------------
@@ -61,9 +58,10 @@ print*,"                    Program ephemerids"
 print*,"*********************************************************"
 print*, 'Parameters : '
 print*,"--------------------------------------"
-print*,"TMAX    =",int(TMAX),"(days)"
+print*,"TMAX    =",int(TMAX/365),"(yr)"
 print*,"N_BOD   =",N_BOD
 print*,"N_EVAL  =",N_EVAL
+print*,"N_FIT   =",N_FIT
 print*,
 print*,"--------------------------------------"
 print*,"1  Sun       5  Mars      9   Neptune"
@@ -76,27 +74,7 @@ print*,"init, file opening..."
 
 call cpu_time(ct0)
 
-OFMT1   = "(3E30.16E3)"   ! fmt of ipms.dat and imps_back.dat
-OFMT2   = "(34E30.16E3)"  ! fmt of traj.dat, traj_back.dat, 
-                          !        vel.dat, vel_back.dat
-OFMT3   = "(7E30.16E3)"   ! fmt of traj_spice.dat
-OFMT4   = "(7E30.16E3)"   ! fmt of 2bodipms_back.dat and _back
-OFTM44  = "(66E30.16E3)"  ! fmt of alld.dat
 
-open(110,file='results/ipms.dat'       ,status='replace')  ! intégrales premières
-open(111,file='results/ipms_back.dat'  ,status='replace')  ! intégrales premières, au retour
-open(1102,file='results/ipms_pf.dat'   ,status='replace')  ! intégrales premières, post fit
-
-open(20,file='results/traj.dat'        ,status='replace')  ! positions
-open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retour
-open(200,file='results/traj_SPICE.dat' ,status='replace')  ! positions SPICE
-open(202,file='results/traj_pf.dat'    ,status='replace')  ! positions post fit
-
-open(30,file='results/vel.dat'         ,status='replace')  ! velocities
-open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au retour
-open(302,file='results/vel_pf.dat'     ,status='replace')  ! velocities post fit
-
-open(16,file='results/out_everhart.dat',status='replace')
 open(44,file='results/alld.dat'        ,status='replace')  ! partial derivatives computed and used in fitting o-c corrections
 
 if (N_BOD .eq. 2) then
@@ -109,6 +87,7 @@ print*,"SPICE trajectories exctraction..."
 print*,"--------------------------------------"
 
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
+open(200,file='results/traj_SPICE.dat' ,status='replace')  ! positions SPICE
 
 itime = 0.
 ftime = SSTEP
@@ -129,8 +108,8 @@ do while (itime .le. TMAX)
 end do
 close(200)
 
-!*******************************************
-!        initialisation (wip)
+
+!              initialisation
 !*******************************************
 
 call get_ET(0d0,ET)
@@ -138,92 +117,66 @@ do j=1,N_BOD
    call translate2NAIF(j,naifid)
    call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
    k = 1 + 3*(j-1)
-   IPositions(k:k+2)  = body_state(1:3) / (AU2M*1e-3)               ! BODY_STATE(1:3) is position IN KILOMETERS   (convert to AU)
-   IVelocities(k:k+2) = body_state(4:6) / (AU2M*1e-3) * 24d0*3600d0 ! BODY_STATE(4:6) is velocity IN KILOMETERS/S (convert to AU/day)
+   IPositions(k:k+2)  = body_state(1:3) / (AU2M*1e-3)
+   IVelocities(k:k+2) = body_state(4:6) / (AU2M*1e-3) * 24d0*3600d0
 end do
+!*******************************************
 
-print*,"========================================================"
+
+print*,"========================================================="
 print*,"                      MAIN LOOP"
-print*,"========================================================"
-
-open(200,file='results/traj_SPICE.dat')   ! for reading
+print*,"========================================================="
 
 print*, "Starting forward integration..."
 
-i     = 0
-ii    = 0
-itime = 0.
-ftime = SSTEP
-Positions  = IPOSITIONS
-Velocities = IVELOCITIES
+open(16, file='results/out_everhart.dat',status='replace')
+open(110,file='results/ipms.dat'        ,status='replace')  ! intégrales premières
+open(20 ,file='results/traj.dat'        ,status='replace')  ! positions
+open(30 ,file='results/vel.dat'         ,status='replace')  ! velocities
+open(200,file='results/traj_SPICE.dat'                   )  ! for reading
 
-call Energy(Positions, Velocities, ftime, Etot)
-call AMomentum(Positions, Velocities, ftime, Ltot)
-write(110,*) "#     time                         Etot                           Ltot"
-write(110,OFMT1) ftime, Etot, Ltot
+Positions  = IPositions
+Velocities = IVelocities
 
-do while (itime .le. TMAX)
-   i = i+1
-   if (mod(i,int(SAMPLERATE)) .eq. 0) then 
-      write(20,OFMT2) itime, Positions
-      write(30,OFMT2) itime, Velocities
-      if (N_BOD .eq. 2) then
-         twobod_ipms = kepler(Positions,Velocities,MASSES)
-         write(100,OFMT4) itime, twobod_ipms
-      end if
-   end if
-
-   !gen O-C with SPICE
-   !********************************************************
-   read(200,*) tmptime, Positions_SPICE
-   if (int(mod(itime,DELTAT_SAMPLE)) .eq. 0) then
-      ii = ii + 1
-      k  = 3*N_BOD*(ii-1) + 1 
-      OminusC(k:k+3*N_BOD-1) = Positions_SPICE - Positions
-   end if
-   !********************************************************
-
-   call walk(Positions, Velocities, itime, ftime)
-   call Energy(Positions, Velocities, ftime, Etot)
-   call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(110,OFMT1) ftime, Etot, Ltot
-   
-   itime = itime + SSTEP
-   ftime = ftime + SSTEP
-end do
-
-print *, "TMAX reached."
-print*,"--------------------------------------"
-print*, "Starting backward integration..."
-
-
-i=0
-itime = ftime
-ftime = itime - SSTEP
-do while (ftime .ge. 0)
-   i = i+1
-   if (mod(i,int(SAMPLERATE)) .eq. 0) then
-      write(21,OFMT2) itime, Positions
-      write(31,OFMT2) itime, Velocities
-      if (N_BOD .eq. 2) then
-         twobod_ipms = kepler(Positions,Velocities,MASSES)
-         write(101,OFMT4) itime, twobod_ipms
-      end if
-   end if
-   call walk(Positions, Velocities, itime, ftime)
-   call Energy(Positions, Velocities, ftime, Etot)
-   call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(111,OFMT1) ftime, Etot, Ltot
-   itime = itime - SSTEP
-   ftime = ftime - SSTEP
-end do
-
-write(21,OFMT2) itime, Positions
-write(31,OFMT2) itime, Velocities
+!***********************************************************************
+!                                      20,     30,     200,      110
+!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
+call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,20,30,200,110) 
+!***********************************************************************
 
 close(16)
+close(110)
+close(20)
+close(30)
+close(200)
 
-print*, "T=0 reached."
+print *, "TMAX reached."
+
+
+!*******************************************************
+! OBSOLETE : subroutine 'run' can't handle t1 < t0 yet
+! déjà un peu refondu au goût du jour néanmoins
+!*******************************************************
+
+! print*,"--------------------------------------"
+! print*, "Starting backward integration..."
+
+
+!open(111,file='results/ipms_back.dat'  ,status='replace')  ! intégrales premières, au retour
+!open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retour
+!open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au retour
+!open(200,file='results/traj_SPICE.dat'                  )  ! for reading
+
+!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
+!call run(Positions,Velocities,Etot,Ltot,TMAX,0d0,OminusC,20,30,200,110) 
+
+!close(111)
+!close(21)
+!close(31)
+!close(200)
+
+! print*, "T=0 reached."
+
 
 if (SWITCH_FIT .eq. 1) then
   print*,"========================================================="
@@ -232,114 +185,74 @@ if (SWITCH_FIT .eq. 1) then
 
   call cpu_time(ct1)
 
-  call computeAllPartials(IPOSITIONS,IVELOCITIES,partials)
-
-  print*,'writing'
-  do i=1,N_EVAL
-     do j=1,3*N_BOD
-        write(44,OFTM44) partials(:,i,j)
+  do k=1,N_FIT
+     print*,"computation of corrections (",k,"/",N_FIT,")"
+     call computeAllPartials(IPositions,IVelocities,partials)
+     
+     do i=1,N_EVAL
+        do j=1,3*N_BOD
+           write(44,OFTM44) partials(:,i,j)
+        end do
      end do
-  !   write(44,*) '# t =', i*DELTAT_SAMPLE
-  end do
-  close(44)
+     close(44)
 
-  call computeCorrections(OminusC,corrections)
+     call computeCorrections(OminusC,corrections)
+     ! print*,"corrections to initial parameters :   "
+     ! print*,"--------------------------------------"
+     ! do i=1,N_BOD
+     !    ii = 6*(i-1)+1
+     !    print*,NAMES(i)
+     !    print*,corrections(ii  ), corrections(ii+3)
+     !    print*,corrections(ii+1), corrections(ii+4)
+     !    print*,corrections(ii+2), corrections(ii+5)
+     ! end do
 
-  print*,"corrections to initial parameters :   "
-  print*,"--------------------------------------"
-  do i=1,N_BOD
-     ii = 6*(i-1)+1
-     print*,NAMES(i)
-     print*,corrections(ii  ), corrections(ii+3)
-     print*,corrections(ii+1), corrections(ii+4)
-     print*,corrections(ii+2), corrections(ii+5)
+     ! RERUN with corrections
+     !--------------------------
+
+     IPositions  = IPositions   + corrections(1         : 3*N_BOD)
+     IVelocities = IVelocities  + corrections(3*N_BOD+1 : 6*N_BOD)
+
+     open(16,  file='results/out_everhart.dat',status='replace')
+     open(1102,file='results/ipms_pf.dat'     ,status='replace')  ! intégrales premières, post fit
+     open(202, file='results/traj_pf.dat'     ,status='replace')  ! positions post fit
+     open(302, file='results/vel_pf.dat'      ,status='replace')  ! velocities post fit
+     open(200, file='results/traj_SPICE.dat'                   )  ! for reading
+
+     Positions  = IPositions
+     Velocities = IVelocities
+
+     !***********************************************************************
+     !                                      202,   302,    200,      1102
+     !subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
+     call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,202,302,200,1102) 
+     !***********************************************************************
+
+     close(16)
+     close(1102)
+     close(202)
+     close(302)
+     close(200)
+
   end do
 end if
 
 call cpu_time(ct2)
 print*,"Time spent on this part of the code :",int(ct2-ct1),"s"
-
-
-print*,"========================================================"
-print*,"                RERUN with corrections"
-print*,"========================================================"
-
-!minimal run, no o-c new eval
-
-Positions  = IPOSITIONS   + corrections(1         :3*N_BOD)
-Velocities = IVELOCITIES  + corrections(3*N_BOD+1 :6*N_BOD)
-
-itime = 0.
-ftime = SSTEP
-i=0
-ii=0
-do while (itime .le. TMAX)
-   i = i+1
-   if (mod(i,int(SAMPLERATE)) .eq. 0) then 
-      write(202,OFMT2) itime, Positions
-      write(302,OFMT2) itime, Velocities
-   end if
-   call walk(Positions, Velocities, itime, ftime)
-   call Energy(Positions, Velocities, ftime, Etot)
-   call AMomentum(Positions, Velocities, ftime, Ltot)
-   write(1102,OFMT1) ftime, Etot, Ltot
-   itime = itime + SSTEP
-   ftime = ftime + SSTEP
-end do
-
-
-!================================================================
-!              SPICE sandbox, working call example
-!================================================================
-
-! if (N_BOD .eq. 2) then
-!    print*, "Calling SPICE for comparative results..."
-!    open(100,file='results/traj_spice.dat',status='replace')
-!    write(100,*) "# date (from origin, in days), Mercury state (position x,y,z then velocity x,y,z)"
-!    write(100,*) "# positions in km, velocities in km/day"
-
-!    call FURNSH('../toolkit/data/de430.bsp')
-   
-!    date_d = 0d0
-!    do while (date_d < TMAX)
-!       call get_ET(date_d,ET)
-!       call SPKEZR('mercury',ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
-!       ! target : name body 'venus','mercury'
-!       ! ET     : date : [(date+date_ini_JJ)-2451545.do]*86400.do
-!       ! REF    : 'J2000'
-!       ! ABCORR : 'NONE'
-!       ! OSB    : 'SOLAR SYSTEM BARYCENTER'
-!       ! STATE  : 'km km/jday' (position/velocity)
-!       ! LT     : Light time   (useless to us)
-!       write(100,OFMT3) date_d, body_state
-!       date_d = date_d + SSTEP
-!    end do
-! end if
-
-
 print*,"Total time spent on execution :",int(ct2-ct0),"s"
 
 print*,"*********************************************************"
 print*,"                    Program end."
 print*,"*********************************************************"
 
-
 !file closing
 if (N_BOD .eq. 2) close(100)
 if (N_BOD .eq. 2) close(101)
 
-close(110)
+close(16)
 close(1102)
-
-close(20)
 close(202)
-
-close(30)
 close(302)
-
-close(111)
-close(21)
-close(31)
 
 close(44)
 
@@ -374,5 +287,48 @@ subroutine translate2NAIF(j,naifid)
   endif
 end subroutine translate2NAIF
 
+
+subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
+  use parameters
+  use formats
+  implicit none
+
+  real(8) :: itime,ftime,t0,t1,tmptime,E,L
+  integer :: trajunit,velunit,spiceunit,ipmsunit
+  real(8),dimension(3*N_BOD) :: X,V,X_SPICE
+  real(8),dimension(3*N_BOD*N_EVAL) :: OC          ! O-C
+  !local
+  integer :: i,ii,k
+
+  i     = 0
+  ii    = 0
+  itime = t0
+  ftime = itime + SSTEP
+
+  do while (itime .le. t1)
+     i = i+1
+     write(trajunit,OFMT2) itime, X
+     write(velunit, OFMT2) itime, V
+     call Energy(X, V, itime, E)
+     call AMomentum(X, V, itime, L)
+     write(ipmsunit,OFMT1) itime, E, L
+
+     !gen O-C with SPICE
+     !********************************************************
+     read(spiceunit,*) tmptime, X_SPICE
+     if (int(mod(itime,DELTAT_SAMPLE)) .eq. 0) then
+        ii = ii + 1
+        k  = 3*N_BOD*(ii-1) + 1 
+        OC(k:k+3*N_BOD-1) = X_SPICE - X
+     end if
+     !********************************************************
+
+     call walk(X, V, itime, ftime)
+
+     itime = itime + SSTEP
+     ftime = ftime + SSTEP
+  end do
+
+end subroutine run
 
 end program ephemerids
