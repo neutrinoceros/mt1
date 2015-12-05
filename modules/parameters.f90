@@ -67,10 +67,9 @@ real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 10
 integer,parameter :: N_EVAL         = floor(TMAX / DELTAT_SAMPLE) + 1
 integer,parameter :: N_FIT          = 5            ! number of fitting iterations
 
-
 ! these are switch ; if switch = 1 main call a subroutine/function/w-e, else don't
 
-integer,parameter :: SWITCH_SECULAR = 1
-integer,parameter :: SWITCH_FIT     = 1
+integer,parameter :: SWITCH_SECULAR = 0
+integer,parameter :: SWITCH_FIT     = 0
 
 end module parameters
