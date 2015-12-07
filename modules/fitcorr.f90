@@ -101,6 +101,11 @@ subroutine computeCorrections(OminusC,corrections)
   real(8) :: chisq
 
   ia(:)      = 1
+  !*********************
+  !do i=1,6
+  !   ia(i)=0
+  !end do
+  !*********************
   ma         = npc                                         !6*N_BOD, we do not ignore any parameter
   covar(:,:) = 0d0
   sig(:)     = 1d0
@@ -114,6 +119,9 @@ subroutine computeCorrections(OminusC,corrections)
   call lfit(X(:size(X)),OminusC(:size(OminusC)),sig(:size(sig)),ndat,&
        corrections(:size(corrections)),&
        ia,ma,covar,npc,chisq,readpartials)
+  !*********************
+  print*,"chisq : ",chisq
+  !*********************
   close(55)
 end subroutine computeCorrections
 

@@ -25,4 +25,5 @@ function norm2(a)
   norm2 = sum(a**2)
 end function norm2
 
+
 end module maths

@@ -15,7 +15,7 @@ use formats
 implicit none
 
 real(8),dimension(:),allocatable :: IPositions, IVelocities
-real(8),dimension(:),allocatable :: Positions, Velocities, Positions_SPICE
+real(8),dimension(:),allocatable :: Positions, Velocities, Positions_SPICE, Velocities_SPICE
 integer :: i,ii,j,k,kk,ll
 real(8) :: itime, ftime,tmptime
 real(8) :: Etot, Ltot
@@ -49,6 +49,7 @@ allocate(IVelocities(3*N_BOD))
 allocate(Positions(3*N_BOD))
 allocate(Velocities(3*N_BOD))
 allocate(Positions_SPICE(3*N_BOD))
+allocate(Velocities_SPICE(3*N_BOD))
 allocate(partials(6*N_BOD,N_EVAL,3*N_BOD))
 if (N_BOD .eq. 2) allocate(twobod_ipms(6))
 
@@ -88,6 +89,7 @@ print*,"--------------------------------------"
 
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
 open(200,file='results/traj_SPICE.dat' ,status='replace')  ! positions SPICE
+open(300,file='results/vel_SPICE.dat'  ,status='replace')  ! velocities SPICE
 
 itime = 0.
 ftime = SSTEP
@@ -97,17 +99,20 @@ do while (itime .le. TMAX)
    do j=1,N_BOD      
       call translate2NAIF(j,naifid)
       call SPKEZR(naifid,ET,'J2000','NONE','SOLAR SYSTEM BARYCENTER',body_state,LT)
-      body_state(1:3) = body_state(1:3) / (AU2M*1e-3) ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
-
+      body_state(1:3) = body_state(1:3) / (AU2M*1e-3)                ! BODY_STATE(1:3) is position IN KILOMETERS (convert to AU)
+      body_state(4:6) = body_state(4:6) / (AU2M*1e-3) * 24d0*3600d0  ! convert to au/day
       k = 1 + 3*(j-1)
-      Positions_SPICE(k:k+2) = body_state(1:3)
+      Positions_SPICE(k:k+2)  = body_state(1:3)
+      Velocities_SPICE(k:k+2) = body_state(4:6)
+      
    end do
    write(200,OFMT2) itime, Positions_SPICE
+   write(300,OFMT2) itime, Velocities_SPICE
    itime = itime + SSTEP
    ftime = ftime + SSTEP
 end do
 close(200)
-
+close(300)
 
 !              initialisation
 !*******************************************
@@ -174,6 +179,11 @@ if (SWITCH_FIT .eq. 1) then
   print*,"========================================================="
   print*,"               Fitting corrections O-C (long)"
   print*,"========================================================="
+
+  !********************************
+  print*,'chi2 pre-fit', sum(OminusC**2)
+  !********************************
+
 
   call cpu_time(ct1)
 
