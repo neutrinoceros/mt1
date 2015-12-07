@@ -19,20 +19,6 @@ subroutine Forces(X, V, time, F)
   F(:)    = 0
   ppn (:) = 0
 
-  if (SWITCH_GR .eq. 1) then          ! general relativity
-     do i=1,N_BOD
-        ii = 3*(i-1)+1
-        do j=i+1,N_BOD
-           jj = 3*(j-1)+1
-           diffpos = X(ii:ii+2)-X(jj:jj+2)
-           D       = sqrt(sum(diffpos**2))
-           ppn(i)  = ppn(i) + GCST*MASSES(j)/D
-           ppn(j)  = ppn(j) + GCST*MASSES(i)/D
-        end do
-     end do
-     ppn = ppn * 2*(BETA+GAMMA)/(CCST**2)
-  end if
-
   do i=1,N_BOD
      ii = 3*(i-1)+1
      do j=i+1,N_BOD
@@ -48,10 +34,22 @@ subroutine Forces(X, V, time, F)
      end do!j
   end do!i
   
-  if (SWITCH_GR .eq. 1) then
+  if (SWITCH_GR .eq. 1) then                 ! general relativity
      do i=1,N_BOD
         ii = 3*(i-1)+1
-        F(ii:ii+2) = F(ii:ii+2) * (1d0-ppn(i))
+        do j=i+1,N_BOD
+           jj = 3*(j-1)+1
+           diffpos = X(ii:ii+2)-X(jj:jj+2)
+           D       = sqrt(sum(diffpos**2))
+           ppn(i)  = ppn(i) + MASSES(j)/D
+           ppn(j)  = ppn(j) + MASSES(i)/D
+        end do
+     end do
+     ppn = ppn * 2*(BETA+GAMMA)*GCST/(CCST**2)
+
+     do i=1,N_BOD
+        ii = 3*(i-1)+1
+        F(ii:ii+2) = F(ii:ii+2) * (1d0 - ppn(i))
      end do
   end if
 
