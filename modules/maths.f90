@@ -26,4 +26,21 @@ function norm2(a)
 end function norm2
 
 
+! Solve equation 
+!   cos(X) = C
+!   sin(X) = S/w
+! Why w ? Usefull to avoid division
+! if necessary, w = 0d0_wp for any precision
+
+function EQ_sincos(C,S,w)
+  implicit none
+  real(8),intent(in)::C,S,w
+  real(8)::EQ_sincos
+  EQ_sincos = Acos(C)
+  if (S>0) then
+    EQ_sincos = -EQ_sincos
+  endif
+end function EQ_sincos
+
+
 end module maths

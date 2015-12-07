@@ -4,6 +4,7 @@ use maths
 use sub_nbodies
 use parameters
 use data_planets ! MASSES
+
 use secular
 use fitcorr
 use formats
@@ -28,7 +29,7 @@ real(8),dimension(:,:,:),allocatable :: partials
 
 !  SPICE useful variables
 !----------------------------
-real(8) :: ET,LT,date_d 
+real(8) :: ET,LT !,date_d 
 real(8),dimension(6) :: body_state !meant to store position and velocities of one single body at a time
 character(len=100)   :: naifid
 
@@ -52,6 +53,7 @@ allocate(Positions_SPICE(3*N_BOD))
 allocate(Velocities_SPICE(3*N_BOD))
 allocate(partials(6*N_BOD,N_EVAL,3*N_BOD))
 if (N_BOD .eq. 2) allocate(twobod_ipms(6))
+if (N_BOD .gt. 2) allocate(twobod_ipms(6*(N_BOD-1)))
 
 
 print*,"*********************************************************"
@@ -63,6 +65,10 @@ print*,"TMAX    =",int(TMAX/365),"(yr)"
 print*,"N_BOD   =",N_BOD
 print*,"N_EVAL  =",N_EVAL
 print*,"N_FIT   =",N_FIT
+print*,
+print*,"Optionnal routines used :"
+print*,"    SWITCH_FIT     ",SWITCH_FIT
+print*,"    SWITCH_SECULAR ",SWITCH_SECULAR 
 print*,
 print*,"--------------------------------------"
 print*,"1  Sun       5  Mars      9   Neptune"
@@ -93,6 +99,7 @@ open(300,file='results/vel_SPICE.dat'  ,status='replace')  ! velocities SPICE
 
 itime = 0.
 ftime = SSTEP
+
 
 do while (itime .le. TMAX)
    call get_ET(itime,ET)
@@ -139,14 +146,16 @@ open(110,file='results/ipms.dat'        ,status='replace')  ! intégrales premi�
 open(20 ,file='results/traj.dat'        ,status='replace')  ! positions
 open(30 ,file='results/vel.dat'         ,status='replace')  ! velocities
 open(200,file='results/traj_SPICE.dat'                   )  ! for reading
+open(500,file='results/kepler.dat'      ,status='replace')  ! for kepler elements
+
 
 Positions  = IPositions
 Velocities = IVelocities
 
 !***********************************************************************
 !                                      20,     30,     200,      110
-!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
-call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,20,30,200,110) 
+!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit,keplerunit)
+call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,20,30,200,110,500) 
 !***********************************************************************
 
 close(16)
@@ -154,6 +163,7 @@ close(110)
 close(20)
 close(30)
 close(200)
+close(500)
 
 print *, "TMAX reached."
 print*,"--------------------------------------"
@@ -163,17 +173,19 @@ open(111,file='results/ipms_back.dat'  ,status='replace')  ! intégrales premiè
 open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retour
 open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au retour
 open(200,file='results/traj_SPICE.dat'                  )  ! for reading
+open(501,file='results/kepler_back.dat',status='replace')  ! for kepler elements
 
-!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
-call run(Positions,Velocities,Etot,Ltot,TMAX,0d0,OminusC,21,31,200,111)
+!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit,keplerunit)
+call run(Positions,Velocities,Etot,Ltot,TMAX,0d0,OminusC,21,31,200,111,501)
 
 close(111)
 close(21)
 close(31)
 close(200)
+close(501)
 
 print*, "T=0 reached."
-
+call cpu_time(ct1)
 
 if (SWITCH_FIT .eq. 1) then
   print*,"========================================================="
@@ -220,14 +232,15 @@ if (SWITCH_FIT .eq. 1) then
      open(202, file='results/traj_pf.dat'     ,status='replace')  ! positions post fit
      open(302, file='results/vel_pf.dat'      ,status='replace')  ! velocities post fit
      open(200, file='results/traj_SPICE.dat'                   )  ! for reading
+     open(502, file='results/kepler_pf.dat'   ,status='replace')  ! for kepler elements
 
      Positions  = IPositions
      Velocities = IVelocities
 
      !**************************************************************************
-     !                                      202,   302,    200,      1102
-     !subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
-     call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,202,302,200,1102) 
+     !                                      202,   302,    200,      1102    502
+     !subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit,keplerunit)
+     call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,202,302,200,1102,502) 
      !**************************************************************************
 
      close(16)
@@ -235,6 +248,7 @@ if (SWITCH_FIT .eq. 1) then
      close(202)
      close(302)
      close(200)
+     close(502)
 
   end do
 end if
