@@ -1,5 +1,6 @@
 module sub_nbodies
 
+
 contains 
 
 subroutine Forces(X, V, time, F)
@@ -127,13 +128,14 @@ subroutine walk(X, V, itime, ftime)
 end subroutine walk
 
 
-subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
+subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit,keplerunit)
   use parameters
+  use secular
   use formats
   implicit none
 
   real(8) :: itime,ftime,t0,t1,tmptime,E,L
-  integer :: trajunit,velunit,spiceunit,ipmsunit
+  integer :: trajunit,velunit,spiceunit,ipmsunit,keplerunit
   real(8),dimension(3*N_BOD) :: X,V,X_SPICE
   real(8),dimension(3*N_BOD*N_EVAL) :: OC          ! O-C
   !local
@@ -148,6 +150,7 @@ subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
      do while (itime .le. t1)
         write(trajunit,OFMT2) itime, X
         write(velunit, OFMT2) itime, V
+        write(keplerunit,OFMT71) itime, secular_kepler(X,V)
         call Energy(X, V, itime, E)
         call AMomentum(X, V, itime, L)
         write(ipmsunit,OFMT1) itime, E, L
@@ -175,6 +178,7 @@ subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
      do while (ftime .ge. -SSTEP)
         write(trajunit,OFMT2) itime, X
         write(velunit, OFMT2) itime, V
+        write(keplerunit,OFMT71) itime, secular_kepler(X,V)
         call Energy(X, V, itime, E)
         call AMomentum(X, V, itime, L)
         write(ipmsunit,OFMT1) itime, E, L

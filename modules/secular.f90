@@ -7,6 +7,8 @@ use type_precision
 contains
 
 
+! CAREFULL : secular = kepler + L (L = M+w+Omega) longitude
+
 function secular_kepler(x,v)
   implicit none
 
@@ -14,10 +16,10 @@ function secular_kepler(x,v)
   real(8),dimension(3*N_BOD),intent(in) :: x,v
 
   ! INTERNALS VARIABLES
-  real(8),dimension(6*(N_BOD-1))        :: secular_kepler ! [a,exc,i,Omega,w,MeanMotion] for each body
-  real(8),dimension(6)                  :: x_tot,v_tot
+  real(8),dimension(7*(N_BOD-1))        :: secular_kepler ! [a,exc,i,Omega,w,MeanMotion] for each body
+  real(8),dimension(6)                  :: x_tot,v_tot,current
   real(8),dimension(2)                  :: m
-  integer::i,ci ! i = body ; ci = center(i)
+  integer::i,ci,ii,ici,is ! i = body ; ci = center(i)
 
   ! an integer in [1..N_BOD] for each body = center of rotation (ex : 4 (Earth) for moon)
   integer,dimension(11) :: CENTER 
@@ -30,20 +32,21 @@ function secular_kepler(x,v)
   do i = 2,N_BOD
     ci = CENTER(i)
     m = [MASSES(i),MASSES(ci)]
+    ii = 3*i-2
+    ici = 3*ci-2
     ! positions / velocities
-    x_tot(4:6) = x(3*i-2:3*i)
-    x_tot(1:3) = x(3*ci-2:3*i)
-    v_tot(4:6) = v(3*i-2:3*i)
-    v_tot(1:3) = v(3*ci-2:3*i)
-    !print*,"x_tot",i,x_tot
-    !print*,"v_tot",i,v_tot
-    !print*,"x_rel",i,x_tot(4:6)-x_tot(1:3)
-    !print*,"r_rel",i,norm(x_tot(4:6)-x_tot(1:3))
-    secular_kepler(6*(i-1)+1:6*(i-1)+6) = kepler(x_tot,v_tot,m)
-    !print*,"Fin Kepler"
+    x_tot(4:6) = x(ii:ii+2)    !position of i body
+    x_tot(1:3) = x(ici:ici+2)  !position of center body
+    v_tot(4:6) = v(ii:ii+2)
+    v_tot(1:3) = v(ici:ici+2)
+
+    current = kepler(x_tot,v_tot,m)
+    is = 7*(i-2)+1
+    secular_kepler(is:is+6) = [current,current(4)+current(5)+current(6)]
+    !print*,NAMES(i)
+    !print*,secular_kepler(is:is+6)
   end do
 end function secular_kepler
-
 
 function kepler(x,v,m) 
   implicit none
@@ -74,7 +77,7 @@ function kepler(x,v,m)
   !moment of inertia
   L = cross(q,s)
   mL = norm(L)
-  k(1:3) = L(1:3)/mu
+  k(1:3) = L(1:3)/mL
 
   ! energy
   h = (0.5e0_wp)*norm2(s) - mu/r
@@ -89,7 +92,7 @@ function kepler(x,v,m)
   p = norm2(L)/mu
   exc = sqrt(1+2*h*p/mu)
   qp = p/(1+exc)
-  a = p/(1-p**2)  
+  a = -mu/(2*h)  
   n = sqrt(mu/a**3)
 
   ! plan of orbit
@@ -102,7 +105,10 @@ function kepler(x,v,m)
 
   w = EQ_sincos(current/(exc*sin(i)),e(3)*sin(i),0e0_wp)
 
-  current = (a+r)/(a*exc)
+  current = (a-r)/(a*exc)
+  !print*,"CURRENT",current
+  !print*,"a,r,exc",a,r,exc
+
   E_E = EQ_sincos(current,xv,0e0_wp)
 
   MeanMotion = E_E - xv/(n*(a**2))

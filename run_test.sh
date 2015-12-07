@@ -21,10 +21,12 @@ else
     cat logcompil.txt
 fi
 
-ipython pyplot/see_postfit.py
+#ipython pyplot/see_postfit.py
 #ipython pyplot/traj.py
-ipython pyplot/ipms.py
-ipython pyplot/mercurydtest.py
+#ipython pyplot/ipms.py
+#ipython pyplot/mercurydtest.py
 #ipython pyplot/2bodiestests.py
+
+#head results/kepler.dat
 
 #head results/alld.dat

@@ -3,12 +3,8 @@ program ephemerids
 use maths
 use sub_nbodies
 use parameters
-<<<<<<< HEAD
-use data_planets ! initial conditions + MASSES
-
-=======
 use data_planets ! MASSES
->>>>>>> master
+
 use secular
 use fitcorr
 use formats
@@ -146,14 +142,16 @@ open(110,file='results/ipms.dat'        ,status='replace')  ! intégrales premi�
 open(20 ,file='results/traj.dat'        ,status='replace')  ! positions
 open(30 ,file='results/vel.dat'         ,status='replace')  ! velocities
 open(200,file='results/traj_SPICE.dat'                   )  ! for reading
+open(500,file='results/kepler.dat'      ,status='replace')  ! for kepler elements
+
 
 Positions  = IPositions
 Velocities = IVelocities
 
 !***********************************************************************
 !                                      20,     30,     200,      110
-!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
-call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,20,30,200,110) 
+!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit,keplerunit)
+call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,20,30,200,110,500) 
 !***********************************************************************
 
 close(16)
@@ -161,6 +159,7 @@ close(110)
 close(20)
 close(30)
 close(200)
+close(500)
 
 print *, "TMAX reached."
 print*,"--------------------------------------"
@@ -170,14 +169,16 @@ open(111,file='results/ipms_back.dat'  ,status='replace')  ! intégrales premiè
 open(21,file='results/traj_back.dat'   ,status='replace')  ! positions, au retour
 open(31,file='results/vel_back.dat'    ,status='replace')  ! velocities, au retour
 open(200,file='results/traj_SPICE.dat'                  )  ! for reading
+open(501,file='results/kepler_back.dat',status='replace')  ! for kepler elements
 
-!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
-call run(Positions,Velocities,Etot,Ltot,TMAX,0d0,OminusC,21,31,200,111)
+!subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit,keplerunit)
+call run(Positions,Velocities,Etot,Ltot,TMAX,0d0,OminusC,21,31,200,111,501)
 
 close(111)
 close(21)
 close(31)
 close(200)
+close(501)
 
 print*, "T=0 reached."
 call cpu_time(ct1)
@@ -222,14 +223,15 @@ if (SWITCH_FIT .eq. 1) then
      open(202, file='results/traj_pf.dat'     ,status='replace')  ! positions post fit
      open(302, file='results/vel_pf.dat'      ,status='replace')  ! velocities post fit
      open(200, file='results/traj_SPICE.dat'                   )  ! for reading
+     open(502, file='results/kepler_pf.dat'   ,status='replace')  ! for kepler elements
 
      Positions  = IPositions
      Velocities = IVelocities
 
      !**************************************************************************
-     !                                      202,   302,    200,      1102
-     !subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit)
-     call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,202,302,200,1102) 
+     !                                      202,   302,    200,      1102    502
+     !subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit,keplerunit)
+     call run(Positions,Velocities,Etot,Ltot,0d0,TMAX,OminusC,202,302,200,1102,502) 
      !**************************************************************************
 
      close(16)
@@ -237,6 +239,7 @@ if (SWITCH_FIT .eq. 1) then
      close(202)
      close(302)
      close(200)
+     close(502)
 
   end do
 end if
