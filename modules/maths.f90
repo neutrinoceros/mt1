@@ -36,6 +36,7 @@ function EQ_sincos(C,S,w)
   implicit none
   real(8),intent(in)::C,S,w
   real(8)::EQ_sincos
+  if (EQ_sincos .lt. 0) print*,"MODULE MATHS, EQ_sincos : ERROR, GRRRRRRRRRRRRRRRRRRR : |COS(X)| > 1"
   EQ_sincos = Acos(C)
   if (S>0) then
     EQ_sincos = -EQ_sincos
