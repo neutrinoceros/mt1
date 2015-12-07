@@ -4,6 +4,7 @@ use maths
 use sub_nbodies
 use parameters
 use data_planets ! initial conditions + MASSES
+
 use secular
 use fitcorr
 
@@ -128,7 +129,7 @@ do while (itime < TMAX)
           twobod_ipms = kepler(Positions,Velocities,MASSES)
           write(100,OFMT4) itime, twobod_ipms
         end if
-        if (N_BOD .eq. 11) then
+        if (N_BOD .ge. 2) then
           print*,"kepler"
           twobod_ipms = secular_kepler(Positions,Velocities)
           write(100,OFMT4) itime, twobod_ipms

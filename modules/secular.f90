@@ -22,7 +22,7 @@ function secular_kepler(x,v)
   ! an integer in [1..N_BOD] for each body = center of rotation (ex : 4 (Earth) for moon)
   integer,dimension(11) :: CENTER 
 
-  CENTER(:) = 1  ! Planets - center : Sun
+  CENTER(1:10) = 1  ! Planets - center : Sun
   CENTER(11) = 4 ! Moon - center : Earth
   secular_kepler(:) = 0
 
@@ -35,10 +35,12 @@ function secular_kepler(x,v)
     x_tot(1:3) = x(3*ci-2:3*i)
     v_tot(4:6) = v(3*i-2:3*i)
     v_tot(1:3) = v(3*ci-2:3*i)
-    print*,"x_tot",i,x_tot
-    print*,"v_tot",i,v_tot
+    !print*,"x_tot",i,x_tot
+    !print*,"v_tot",i,v_tot
+    !print*,"x_rel",i,x_tot(4:6)-x_tot(1:3)
+    !print*,"r_rel",i,norm(x_tot(4:6)-x_tot(1:3))
     secular_kepler(6*(i-1)+1:6*(i-1)+6) = kepler(x_tot,v_tot,m)
-    !print*,secular_kepler
+    !print*,"Fin Kepler"
   end do
 end function secular_kepler
 
@@ -56,7 +58,6 @@ function kepler(x,v,m)
   real(8),dimension(6):: kepler
 
   ! LOCAL VAR :
-
   real(8),dimension(3) :: q,s,u,L,k,e,v_c
   real(8) :: mu,r,mL,h,p,exc,qp,a,i,Omega,w,current,MeanMotion,xv,E_E,n
 
