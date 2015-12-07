@@ -8,6 +8,7 @@ results/*
 *#
 modules/data_planets.f90
 logcompil.txt
+fort.*
 
 # Compiled Object files
 *.slo

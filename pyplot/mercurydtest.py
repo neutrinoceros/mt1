@@ -25,7 +25,7 @@ def distance(p1,p2) :
 
 tab1  = np.loadtxt("./results/traj.dat"      , dtype = np.float64)
 tab2  = np.loadtxt("./results/traj_back.dat" , dtype = np.float64)
-tab3  = np.loadtxt("./results/traj_spice.dat", dtype = np.float64)
+tab3  = np.loadtxt("./results/traj_SPICE.dat", dtype = np.float64)
 n_bod = (tab1.shape[1]-1)/3
 niter = tab1.shape[0]
 time  = tab1[:,0]
@@ -38,9 +38,10 @@ dm0 = np.zeros(niter, dtype = np.float64)
 dm1 = np.zeros(niter, dtype = np.float64)
 dm2 = np.zeros(niter, dtype = np.float64)
 for i in range(niter) :
+    k  = niter-(i+1)
     p1 = tab1[i,4:7]
-    p2 = tab2[niter-(i),4:7]
-    p_spice = tab3[i,1:4]/au2km
+    p2 = tab2[k,4:7]
+    p_spice = tab3[i,4:7]
     dm1[i] = distance(p1,p_spice)
     dm2[i] = distance(p2,p_spice)
     dm0[i] = distance(p1,p2)
