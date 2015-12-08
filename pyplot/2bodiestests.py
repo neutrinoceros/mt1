@@ -12,8 +12,6 @@
 
 from pybox import *
 
-def relaterr(qty) :
-    return abs(qty - qty[0])/qty[0]
 
 tab1 = np.loadtxt('results/kepler.dat')
 tab2 = np.loadtxt('results/kepler_back.dat')
@@ -24,7 +22,7 @@ t2,a2,i2,e2,OM2,om2,M2 = tab2[:,0],tab2[:,1],tab2[:,2],tab2[:,3],tab2[:,4],tab2[
 fig,ax = pl.subplots()
 
 #for qty,label in zip([a1,e1,i1,OM1,om1,M1],[r'$a$',r'$e$',r'$i$',r'$\Omega$',r'$\omega$',r'$M$']) :
-    #err = relaterr(qty)
+    #err = relat_error(qty)
     #ax.semilogy(t1,err,label=label,lw=LW)
 #    ax.plot(t1,qty,label=label,lw=LW)
  

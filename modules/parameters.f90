@@ -17,6 +17,7 @@ real(8),parameter :: j2000_jd     = 2451545.0 ! january 1st 2000 in Julian days
 integer,parameter :: N_BOD = 11
 real(8),parameter :: GCST  = 0.2959122082855911e-3
 real(8),parameter :: CCST  = 299792458 /AU2M * 24d0*3600d0
+
 ! general relativity : GAMMA = BETA = 1
 real(8),parameter :: GAMMA = 1.
 real(8),parameter :: BETA  = 1.
@@ -50,7 +51,7 @@ real(8),parameter :: BETA  = 1.
 
 real(8),parameter :: ISTEP      = 2d0  
 real(8),parameter :: SSTEP      = 2d0 
-real(8),parameter :: TMAX       = 36500
+real(8),parameter :: TMAX       = 3650
 integer,parameter :: SAMPLERATE = 1
 
 !======================================================================
@@ -75,7 +76,7 @@ integer,parameter :: N_FIT          = 2            ! number of fitting iteration
 ! these are switch ; if switch = 1 main call a subroutine/function/w-e, else don't
 
 integer,parameter :: SWITCH_SECULAR = 0
-integer,parameter :: SWITCH_FIT     = 0
+integer,parameter :: SWITCH_FIT     = 1
 integer,parameter :: SWITCH_GR      = 1
 
 end module parameters

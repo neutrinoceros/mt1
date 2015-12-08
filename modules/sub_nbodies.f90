@@ -183,7 +183,7 @@ subroutine run(X,V,E,L,t0,t1,OC,trajunit,velunit,spiceunit,ipmsunit,keplerunit)
         read(spiceunit,*) tmptime, X_SPICE
         if (int(mod(itime,DELTAT_SAMPLE)) .eq. 0) then
            ii = ii + 1
-           k  = 3*N_BOD*(ii-1) + 1 
+           k  = 3*N_BOD*(ii-1) + 1
            OC(k:k+3*N_BOD-1) = X_SPICE - X
         end if
         !********************************************************

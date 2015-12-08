@@ -94,8 +94,9 @@ print*,"SPICE trajectories exctraction..."
 print*,"--------------------------------------"
 
 call FURNSH('../toolkit/data/de430.bsp') ! SPICE loading
-open(200,file='results/traj_SPICE.dat' ,status='replace')  ! positions SPICE
-open(300,file='results/vel_SPICE.dat'  ,status='replace')  ! velocities SPICE
+open(200,file='results/traj_SPICE.dat'  ,status='replace')  ! positions SPICE
+open(300,file='results/vel_SPICE.dat'   ,status='replace')  ! velocities SPICE
+open(400,file='results/kepler_SPICE.dat',status='replace')  ! secular elements
 
 itime = 0.
 ftime = SSTEP
@@ -113,13 +114,15 @@ do while (itime .le. TMAX)
       Velocities_SPICE(k:k+2) = body_state(4:6)
       
    end do
-   write(200,OFMT2) itime, Positions_SPICE
-   write(300,OFMT2) itime, Velocities_SPICE
+   write(200,OFMT2)  itime, Positions_SPICE
+   write(300,OFMT2)  itime, Velocities_SPICE
+   write(400,OFMT71) itime, secular_kepler(Positions_SPICE,Velocities_SPICE)
    itime = itime + SSTEP
    ftime = ftime + SSTEP
 end do
 close(200)
 close(300)
+close(400)
 
 !              initialisation
 !*******************************************

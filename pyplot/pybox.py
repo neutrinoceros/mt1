@@ -2,6 +2,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pylab as pl
 
+au2km = 149597870.700 # number of km in one AU 
 
 #---------------------------------------------------
 #     global parameters used in plotting scripts
@@ -33,3 +34,15 @@ def saveimg(figure) :
         figure.savefig('./img/'+imgname+ext)
         figure.savefig('./img/'+imgname+'_t'+ext,transparent=True)
 
+#---------------------------------------------------
+#                     maths
+#---------------------------------------------------
+
+def relat_error(vect) :
+    vi = vect[0]
+    return abs((vect-vi)/vi)
+
+def distance(p1,p2) :
+    #assumes p1 and p2 are 1D array-likes of equal lenght 
+    d = np.sqrt(np.sum((p1-p2)**2)) 
+    return d

@@ -50,16 +50,18 @@ subroutine computeTabDr(Xi,Vi,n,tab_DR)
   !   computation
   ! ---------------
 
-  open(16,file='results/out_everhart.dat',status='replace')
-  do j=1,N_EVAL 
-     do while(itime < j*DELTAT_SAMPLE)
-        call walk(X1, V1, itime, ftime)
-        call walk(X2, V2, itime, ftime)
-        itime = itime + ISTEP
-        ftime = ftime + ISTEP
-     end do
-     tab_DR(j,:) = (X1-X2)/(2*EPSILON)
+  j = 1
+  do while(itime .lt. TMAX)
+     if (int(mod(itime,DELTAT_SAMPLE)) .eq. 0) then
+        tab_DR(j,:) = (X1-X2)/(2*EPSILON)
+        j = j+1
+     end if
+     call walk(X1, V1, itime, ftime)
+     call walk(X2, V2, itime, ftime)
+     itime = itime + SSTEP
+     ftime = ftime + SSTEP
   end do
+
   close(16)
 
 end subroutine computeTabDr
@@ -93,34 +95,35 @@ end subroutine computeAllPartials
 subroutine computeCorrections(OminusC,corrections)
   use parameters
   implicit none
-  integer :: ndat=3*N_BOD*N_EVAL, npc=6*N_BOD, ma,i
+  integer :: ndat=3*N_BOD*N_EVAL,npc=6*N_BOD,ma,i
   real(8),dimension(3*N_BOD*N_EVAL)  :: X,OminusC,sig     ! X = arange(ndat), OminusC is "obs - code" for positions
   real(8),dimension(6*N_BOD)         :: corrections
   integer,dimension(6*N_BOD)         :: ia
   real(8),dimension(6*N_BOD,6*N_BOD) :: covar
   real(8) :: chisq
 
+  !*********************
+  real(8) :: dummy 
+  real(8),dimension(6*N_BOD) :: dumline
+  !*********************
+
   ia(:)      = 1
   !*********************
-  !do i=1,6
-  !   ia(i)=0
-  !end do
+  do i=1,6
+     ia(i)=0
+  end do                 ! Sun held constant
   !*********************
-  ma         = npc                                         !6*N_BOD, we do not ignore any parameter
-  covar(:,:) = 0d0
-  sig(:)     = 1d0
-  chisq      = 0d0
+  ma         = npc                                     ! dim of corrections
+  sig(:)     = 1d0                                     ! ponderation (leave it at 1 everywhere)
   
   do i=1,ndat
      X(i) = i
   end do
 
   open(55,file='results/alld.dat')
-  call lfit(X(:size(X)),OminusC(:size(OminusC)),sig(:size(sig)),ndat,&
-       corrections(:size(corrections)),&
-       ia,ma,covar,npc,chisq,readpartials)
+  call lfit(X,OminusC,sig,ndat,corrections,ia,ma,covar,npc,chisq,readpartials)
   !*********************
-  print*,"chisq : ",chisq
+  print*,"chi2 : ",chisq
   !*********************
   close(55)
 end subroutine computeCorrections

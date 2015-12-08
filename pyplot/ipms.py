@@ -12,10 +12,6 @@
 
 from pybox import *
 
-def relat_error(vect) :
-    vi = vect[0]
-    return abs((vect-vi)/vi)
-
 dataf = "results/ipms.dat"
 tab   = np.loadtxt(dataf, dtype = np.float64)
 t,e,l = tab[:,0],tab[:,1],tab[:,2]
