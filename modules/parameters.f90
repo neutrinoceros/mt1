@@ -51,7 +51,7 @@ real(8),parameter :: BETA  = 1.
 
 real(8),parameter :: ISTEP      = 2d0  
 real(8),parameter :: SSTEP      = 2d0 
-real(8),parameter :: TMAX       = 36500
+real(8),parameter :: TMAX       = 3650
 integer,parameter :: SAMPLERATE = 1
 
 !======================================================================

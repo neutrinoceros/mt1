@@ -19,7 +19,7 @@ subroutine Forces(X, V, time, F)
   F(:)    = 0
   ppn (:) = 0
 
-  do i=1,N_BOD
+  do i=2,N_BOD
      ii = 3*(i-1)+1
      do j=i+1,N_BOD
         jj = 3*(j-1)+1
@@ -29,12 +29,19 @@ subroutine Forces(X, V, time, F)
         dF = GCST * diffpos / D**3
         F(ii:ii+2) = F(ii:ii+2) - dF * Masses(j)
         F(jj:jj+2) = F(jj:jj+2) + dF * Masses(i)
-        !note that those are forces *by units of mass*, ie accelerations.
-        !This corresponds to what the RADAU integrator denotes as "forces", if I'm not mistaken 
+        ! note that those are forces *by units of mass*, ie accelerations.
+        ! This corresponds to what the RADAU integrator denotes as "forces", if I'm not mistaken 
      end do!j
+     ! sun's attraction is added last
+     diffpos = X(ii:ii+2) - X(1:3)
+     D       = sqrt(sum(diffpos**2))
+     dF      = GCST * diffpos / D**3
+
+     F(ii:ii+2) = F(ii:ii+2) - dF * Masses(1)
+     F(1:3)     = F(1:3)     + dF * Masses(i)
   end do!i
-  
-  if (SWITCH_GR .eq. 1) then                 ! general relativity
+
+  if (SWITCH_GR .eq. 1) then                 ! general relativity (ppn)
      do i=1,N_BOD
         ii = 3*(i-1)+1
         do j=i+1,N_BOD
