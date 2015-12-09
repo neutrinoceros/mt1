@@ -102,19 +102,19 @@ ax12.set_title('longitudes moyennes (post fist)')
 #    lune
 #=================
 
-# fig3,ax03 = pl.subplots(nrows=1, sharex=True)
+fig3,ax03 = pl.subplots(nrows=1, sharex=True)
 
-# #jj = 64 :: Moon (7*9+1)
-# jj               = 7*4+1
-# a,e,i,O,o,M,L    = tab11[:,jj],tab11[:,jj+1],tab11[:,jj+2],tab11[:,jj+3],tab11[:,jj+4],tab11[:,jj+5],tab11[:,jj+6]
+#jj = 64 :: Moon (7*9+1)
+jj               = 64
+a,e,i,O,o,M,L    = tab11[:,jj],tab11[:,jj+1],tab11[:,jj+2],tab11[:,jj+3],tab11[:,jj+4],tab11[:,jj+5],tab11[:,jj+6]
 
-# #for qty,label in zip([a,e,i,O,o,M,L],['a','e','i','O','o','M','L']) :
-# #    ax03.plot(time,qty,lw=2,alpha=ALPHA,ls='-',label=label)
-# for qty,label in zip([o,L],['o','L']) :
-#     ax03.plot(time,qty,lw=2,alpha=ALPHA,ls='-',label=label)
+#for qty,label in zip([a,e,i,O,o,M,L],['a','e','i','O','o','M','L']) :
+#    ax03.plot(time,qty,lw=2,alpha=ALPHA,ls='-',label=label)
+for qty,label in zip([o,L],['o','L']) :
+    ax03.plot(time,qty,lw=2,alpha=ALPHA,ls='-',label=label)
 
-# ax03.set_xlim(min(time),max(time))
-# ax03.set_xlabel(r'$t$ [yr]',size=SIZE)
-# ax03.legend(ncol=3, frameon=False,loc=2)
+ax03.set_xlim(min(time),max(time))
+ax03.set_xlabel(r'$t$ [yr]',size=SIZE)
+ax03.legend(ncol=3, frameon=False,loc=2)
 
 pl.show()

@@ -51,7 +51,7 @@ real(8),parameter :: BETA  = 1.
 
 real(8),parameter :: ISTEP      = 2d0  
 real(8),parameter :: SSTEP      = 2d0 
-real(8),parameter :: TMAX       = 3650
+real(8),parameter :: TMAX       = 36500
 integer,parameter :: SAMPLERATE = 1
 
 !======================================================================
@@ -69,9 +69,9 @@ integer,parameter :: SAMPLERATE = 1
 !======================================================================
 
 real(8),parameter :: EPSILON        = 1e-10        ! approx 15m (in a.u.) and 15m/day
-real(8),parameter :: DELTAT_SAMPLE  = SSTEP * 10
-integer,parameter :: N_EVAL         = floor(TMAX / DELTAT_SAMPLE) + 1
-integer,parameter :: N_FIT          = 2            ! number of fitting iterations
+integer,parameter :: N_EVAL         = 150
+real(8),parameter :: DELTAT_SAMPLE  = TMAX/real(N_EVAL)
+integer,parameter :: N_FIT          = 1            ! number of fitting iterations
 
 ! these are switch ; if switch = 1 main call a subroutine/function/w-e, else don't
 
