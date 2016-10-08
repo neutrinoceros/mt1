@@ -31,8 +31,11 @@ ax.semilogy(t,errL,c='r',label=r'err$(L)$',lw=LW,alpha=ALPHA)
 ax.set_xlim(min(t),max(t))
 
 ax.set_xlabel(r'$t$ [yr]',size=SIZE)
-ax.set_ylabel(r'err$(\psi)=|\psi-\psi_0|/\psi_0$',size=SIZE)
+ax.set_ylabel(r'err$(\psi)=|\psi-\psi_0|/\psi_0$',size=SIZE,fontdict=font)
+#ax.ticklabel_format(axis='y', style='sci', scilimits=(-2,2))
 
 ax.legend(frameon=False,loc=2,fontsize=SIZE)
+
+saveimg(fig,'ipms')
 
 pl.show()

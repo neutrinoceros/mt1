@@ -214,15 +214,15 @@ if (SWITCH_FIT .eq. 1) then
      close(44)
 
      call computeCorrections(OminusC,corrections)
-     ! print*,"corrections to initial parameters :   "
-     ! print*,"--------------------------------------"
-     ! do i=1,N_BOD
-     !    ii = 6*(i-1)+1
-     !    print*,NAMES(i)
-     !    print*,corrections(ii  ), corrections(ii+3)
-     !    print*,corrections(ii+1), corrections(ii+4)
-     !    print*,corrections(ii+2), corrections(ii+5)
-     ! end do
+     print*,"corrections to initial parameters :   "
+     print*,"--------------------------------------"
+     do i=1,N_BOD
+        ii = 6*(i-1)+1
+        print*,NAMES(i)
+        print*,corrections(ii  ), corrections(ii+3)
+        print*,corrections(ii+1), corrections(ii+4)
+        print*,corrections(ii+2), corrections(ii+5)
+     end do
 
      ! RERUN with corrections
      !--------------------------

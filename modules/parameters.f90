@@ -49,9 +49,9 @@ real(8),parameter :: BETA  = 1.
 !  * 6mounths = 182 days
 !----------------------------------------------------------------------
 
-real(8),parameter :: ISTEP      = 2d0  
-real(8),parameter :: SSTEP      = 2d0 
-real(8),parameter :: TMAX       = 3650
+real(8),parameter :: ISTEP      = 2d0
+real(8),parameter :: SSTEP      = ISTEP
+real(8),parameter :: TMAX       = 36500
 integer,parameter :: SAMPLERATE = 1
 
 !======================================================================
@@ -76,7 +76,7 @@ integer,parameter :: N_FIT          = 1            ! number of fitting iteration
 ! these are switch ; if switch = 1 main call a subroutine/function/w-e, else don't
 
 integer,parameter :: SWITCH_SECULAR = 0
-integer,parameter :: SWITCH_FIT     = 1
-integer,parameter :: SWITCH_GR      = 1
+integer,parameter :: SWITCH_FIT     = 0
+integer,parameter :: SWITCH_GR      = 0
 
 end module parameters

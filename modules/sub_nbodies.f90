@@ -16,8 +16,8 @@ subroutine Forces(X, V, time, F)
   real(8),dimension(3) :: diffpos, dF ! relative position, contribution to force on a body. tmp variables.
   real(8),dimension(N_BOD) :: ppn     ! ppn factor (first order used)
   
-  F(:)    = 0
-  ppn (:) = 0
+  F(:)    = 0d0
+  ppn (:) = 0d0
 
   do i=2,N_BOD
      ii = 3*(i-1)+1
@@ -42,23 +42,32 @@ subroutine Forces(X, V, time, F)
   end do!i
 
   if (SWITCH_GR .eq. 1) then                 ! general relativity (ppn)
-     do i=1,N_BOD
-        ii = 3*(i-1)+1
-        do j=i+1,N_BOD
-           jj = 3*(j-1)+1
-           diffpos = X(ii:ii+2)-X(jj:jj+2)
-           D       = sqrt(sum(diffpos**2))
-           ppn(i)  = ppn(i) + MASSES(j)/D
-           ppn(j)  = ppn(j) + MASSES(i)/D
-        end do
-     end do
-     ppn = ppn * 2*(BETA+GAMMA)*GCST/(CCST**2)
-
-     do i=1,N_BOD
-        ii = 3*(i-1)+1
-        F(ii:ii+2) = F(ii:ii+2) * (1d0 - ppn(i))
-     end do
+     ii = 1
+     jj = 4
+     diffpos = X(ii:ii+2)-X(jj:jj+2)
+     D       = sqrt(sum(diffpos**2))
+     ppn(2)  = MASSES(1)/D * 2*(BETA+GAMMA)*GCST/(CCST**2)
+     F(jj:jj+2) = F(jj:jj+2) * (1d0 - ppn(2))
   end if
+
+  ! if (SWITCH_GR .eq. 1) then                 ! general relativity (ppn)
+  !    do i=1,N_BOD
+  !       ii = 3*(i-1)+1
+  !       do j=i+1,N_BOD
+  !          jj = 3*(j-1)+1
+  !          diffpos = X(ii:ii+2)-X(jj:jj+2)
+  !          D       = sqrt(sum(diffpos**2))
+  !          ppn(i)  = ppn(i) + MASSES(j)/D
+  !          ppn(j)  = ppn(j) + MASSES(i)/D
+  !       end do
+  !    end do
+  !    ppn = ppn * 2*(BETA+GAMMA)*GCST/(CCST**2)
+
+  !    do i=1,N_BOD
+  !       ii = 3*(i-1)+1
+  !       F(ii:ii+2) = F(ii:ii+2) * (1d0 - ppn(i))
+  !    end do
+  ! end if
 
 end subroutine Forces
 

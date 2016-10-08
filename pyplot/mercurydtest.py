@@ -53,14 +53,23 @@ time /= 365             #conversion 'day  --> yr'
 
 #    plotting
 #=================
-fig, (ax0, ax1) = pl.subplots(nrows=2, sharex=True)
+#fig, (ax0, ax1) = pl.subplots(nrows=2, sharex=True)
 
-ax0.semilogy(time,dm1,lw=1,alpha=ALPHA,ls='-' ,c='r')
-ax1.semilogy(time,dm0,lw=1,alpha=ALPHA,ls='-' ,c='b')
+fig1 = pl.figure()
+ax1  = fig1.add_subplot(111)
 
-ax0.set_xlim(min(time),max(time))
-ax0.set_ylabel(r'$|\overrightarrow{r}_{for}-\overrightarrow{r}_{SPICE}|$ [a.u.]',size=SIZE)
-ax1.set_ylabel(r'$|\overrightarrow{r}_{for}-\overrightarrow{r}_{back}|$ [m]'    ,size=SIZE)
-ax1.set_xlabel(r'$t$ [yr]',size=SIZE)
+#ax0.semilogy(time,dm1,lw=1,alpha=ALPHA,ls='-' ,c='r')
+DM0 = dm0
+#for i in range(3) :
+#    DM0 = lisse(DM0,100)
+#ax1.plot(time,DM0,lw=LW,alpha=ALPHA,ls=LS,c='k')
+ax1.plot(time,dm0,lw=LW/3,alpha=ALPHA,ls=LS,c='k')
 
+ax1.set_xlim(min(time),max(time))
+#ax0.set_ylabel(r'$|\overrightarrow{r}_{for}-\overrightarrow{r}_{SPICE}|$ [a.u.]',size=SIZE)
+ax1.set_ylabel(r'$|\overrightarrow{r}_{for}-\overrightarrow{r}_{back}|$ [m]'    ,size=SIZE,fontdict=font)
+
+ax1.set_xlabel(r'$t$ [yr]',size=SIZE,fontdict=font)
+ax1.ticklabel_format(axis='y', style='sci', scilimits=(-2,2))
+saveimg(fig1,'armercure')
 pl.show()
