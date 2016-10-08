@@ -1,0 +1,26 @@
+Slides :
+
+* = une slide
+
+I / Contexte :
+* Calcul des éphémérides
+* Systèmes de référence (GCRS/BCSR)
+* Délai Shapiro
+* Une vérif : périhélie de Mercure ; formalisme PPN
+
+
+II / Intégration des IPM :
+* Quelle équation ?
+* Quel intégrateur ? Everhart // (montrer autres mauvais intégrateurs)
+* Une vérif : pas de temps : A/R sur 10 ans, 1cm d'erreur
+* Conservation (quasi car pas symplectique) des IPM ; 1ère erreur car doublement de l'énergie potentielle
+
+
+III / Prefit-postfit
+* Modélisation avec écart aux CI : dérive, non due à un phénomène physique.
+* Figure théorique postfit attendue (fig de Valery)
+* Ce qu'on observe : OK pour les autres planètes, mauvais pour Mercrure
+
+IV / Arrivée du PPN
+* Comment on l'implémente ? (1-PPN)
+* On observe quoi ? Écart mais bon ordre de grandeur.
